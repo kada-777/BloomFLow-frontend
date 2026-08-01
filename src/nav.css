@@ -1,0 +1,15 @@
+.nav-group {
+  margin-bottom: 14px;
+}
+
+.nav-group p {
+  margin: 17px 12px 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.nav-group:first-of-type p {
+  margin-top: 0;
+}
