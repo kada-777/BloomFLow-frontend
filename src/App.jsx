@@ -14,7 +14,11 @@ import FlowerCatalog from "./pages/FlowerCatalog";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 function Protected() {
-  return useAuth().user ? <AppLayout /> : <Navigate to="/auth" replace />;
+  const { user, isRestoring } = useAuth();
+
+  if (isRestoring) return null;
+
+  return user ? <AppLayout /> : <Navigate to="/auth" replace />;
 }
 export default function App() {
   return (

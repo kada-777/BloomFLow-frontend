@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { PageHeader, SearchBar, StatusBadge } from "../../components/ui";
 import DataTable from "../../components/common/DataTable";
-import { flowers } from "../../utils/data";
 const columns = [
   { key: "name", label: "Flower", render: (x) => <b>{x.name}</b> },
   { key: "category", label: "Category" },
@@ -21,11 +20,7 @@ const columns = [
 export default function Inventory() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("All");
-  const data = flowers.filter(
-    (x) =>
-      (status === "All" || x.status === status) &&
-      x.name.toLowerCase().includes(q.toLowerCase()),
-  );
+  const data = [];
   return (
     <>
       <PageHeader

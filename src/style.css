@@ -39,103 +39,18 @@ select {
 button {
   cursor: pointer;
 }
-.shell {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 260px 1fr;
-}
-aside {
-  background: var(--card);
-  border-right: 1px solid var(--border);
-  padding: 25px 13px;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  height: 100vh;
-  width: 260px;
-  z-index: 3;
-}
-.brand {
-  font: 700 20px "Plus Jakarta Sans";
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.brand svg {
-  color: var(--accent);
-}
-.brand button {
-  margin-left: auto;
-  border: 0;
-  background: none;
-  color: var(--muted);
-}
-.workspace {
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  font-weight: 700;
-  margin: 36px 12px 10px;
-}
-aside a {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  text-decoration: none;
-  padding: 11px 13px;
-  margin: 2px 0;
-  color: var(--muted);
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-}
-aside a.active,
-aside a:hover {
-  background: var(--soft);
-  color: var(--text);
-}
-.sidebar-note {
-  margin: auto 8px 0;
-  padding: 15px;
-  background: var(--soft);
-  border-radius: 15px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.sidebar-note b {
-  display: block;
-  color: var(--text);
-  margin: 5px 0 10px;
-}
-.sidebar-note div,
 .progress {
   height: 5px;
   background: var(--border);
   border-radius: 8px;
   overflow: hidden;
 }
-.sidebar-note i,
 .progress i {
   display: block;
   height: 100%;
   width: 92%;
   background: var(--sage);
   border-radius: 8px;
-}
-main {
-  grid-column: 2;
-}
-.navbar {
-  height: 76px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 34px;
-  background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 .search {
   display: flex;
@@ -155,57 +70,6 @@ main {
   width: 100%;
   font-size: 13px;
 }
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.icon-button {
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  border-radius: 10px;
-  width: 37px;
-  height: 37px;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-.icon-button i {
-  position: absolute;
-  background: #c75c5c;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  right: 8px;
-  top: 8px;
-}
-.role-select {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--soft);
-  padding: 9px;
-  border-radius: 10px;
-}
-.role-select select {
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-}
-.user-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  background: none;
-  color: var(--text);
-  text-align: left;
-}
-.user-pill > b,
 .avatar-cell > b {
   display: grid;
   place-items: center;
@@ -214,16 +78,6 @@ main {
   border-radius: 50%;
   background: #eadfcf;
   color: #76555b;
-}
-.user-pill span {
-  font-size: 12px;
-  font-weight: 600;
-}
-.user-pill small {
-  display: block;
-  color: var(--muted);
-  font-weight: 400;
-  margin-top: 2px;
 }
 .content {
   padding: 36px;
@@ -650,9 +504,6 @@ tr:last-child td {
   height: 28px;
   font-size: 10px;
 }
-.mobile-menu {
-  display: none;
-}
 .auth {
   min-height: 100vh;
   display: grid;
@@ -747,13 +598,57 @@ form input {
   justify-content: center;
   margin-top: 23px;
 }
+.login-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.form-error {
+  color: #a84646;
+  font-size: 12px;
+  margin: 16px 0 -7px;
+}
+.modal-backdrop {
+  align-items: center;
+  background: #0005;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 10;
+}
+.confirm-dialog {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  max-width: 390px;
+  padding: 24px;
+  width: 100%;
+}
+.confirm-dialog h2 {
+  font: 700 19px "Plus Jakarta Sans";
+  margin: 0 0 8px;
+}
+.confirm-dialog p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+.logout-button {
+  background: #a84646;
+}
 .login-card > small {
   display: block;
   text-align: center;
   line-height: 1.5;
-}
-.scrim {
-  display: none;
 }
 @media (max-width: 1050px) {
   .stat-grid {
@@ -775,41 +670,6 @@ form input {
   }
 }
 @media (max-width: 760px) {
-  .shell {
-    display: block;
-  }
-  .shell aside {
-    transform: translateX(-100%);
-    transition: 0.25s;
-  }
-  .shell aside.open {
-    transform: translateX(0);
-  }
-  .scrim {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: #0004;
-    z-index: 2;
-  }
-  main {
-    width: 100%;
-  }
-  .navbar {
-    padding: 0 16px;
-  }
-  .mobile-menu {
-    display: grid;
-  }
-  .navbar .search {
-    display: none;
-  }
-  .role-select {
-    display: none;
-  }
-  .user-pill span {
-    display: none;
-  }
   .content {
     padding: 24px 16px;
   }
@@ -860,12 +720,6 @@ form input {
     margin: -20px auto 30px;
     width: 92%;
     position: relative;
-  }
-  .navbar .nav-actions {
-    margin-left: auto;
-  }
-  .nav-actions {
-    gap: 6px;
   }
   .content {
     overflow: hidden;

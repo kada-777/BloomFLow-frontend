@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard,
   Package,
@@ -12,7 +13,6 @@ import {
   Flower2,
   Users,
   Settings,
-  PanelLeftClose,
 } from "lucide-react";
 import { Navbar } from "../components/ui";
 import "../nav.css";
@@ -101,20 +101,27 @@ const menus = {
     ],
   ],
 };
+
+const roleLabels = {
+  SUPERADMIN: "Super Admin",
+  STAFF_HEAD_OFFICE: "Head Office",
+  STAFF_BRANCH: "Branch Staff",
+};
+
 export default function AppLayout() {
-  const [role, setRole] = useState("Super Admin");
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const role = roleLabels[user?.role?.toUpperCase()] || "Unknown role";
+  const roleMenus = menus[role] || [];
+
   return (
     <div className="shell">
       <aside className={open ? "open" : ""}>
         <div className="brand">
           <Flower2 /> <span>BloomFlow</span>
-          <button onClick={() => setOpen(false)}>
-            <PanelLeftClose size={18} />
-          </button>
         </div>
         <p className="workspace">{role} VIEW</p>
-        {menus[role].map(([group, items]) => (
+        {roleMenus.map(([group, items]) => (
           <section className="nav-group" key={group}>
             <p>{group}</p>
             {items.map(([name, Icon, path]) => (
@@ -130,17 +137,10 @@ export default function AppLayout() {
             ))}
           </section>
         ))}
-        <div className="sidebar-note">
-          <span>Supply health</span>
-          <b>92% on track</b>
-          <div>
-            <i />
-          </div>
-        </div>
       </aside>
       {open && <div className="scrim" onClick={() => setOpen(false)} />}
       <main>
-        <Navbar role={role} setRole={setRole} onMenu={() => setOpen(true)} />
+        <Navbar role={role} onMenu={() => setOpen(true)} />
         <div className="content">
           <Outlet context={{ role }} />
         </div>

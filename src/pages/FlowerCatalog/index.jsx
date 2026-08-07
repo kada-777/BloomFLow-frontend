@@ -1,6 +1,5 @@
-import { PageHeader } from "../../components/ui";
-import FlowerCard from "../../components/common/FlowerCard";
-import { flowers } from "../../utils/data";
+import { EmptyState, PageHeader } from "../../components/ui";
+
 export default function FlowerCatalog() {
   return (
     <>
@@ -9,11 +8,7 @@ export default function FlowerCatalog() {
         subtitle="The central product library for every branch"
         action="+ Add flower"
       />
-      <div className="catalog-grid">
-        {flowers.map((flower, index) => (
-          <FlowerCard key={flower.name} flower={flower} index={index} />
-        ))}
-      </div>
+      <EmptyState title="Flower catalog data will appear once the API is connected." />
     </>
   );
 }
