@@ -87,15 +87,16 @@ export function Navbar({ role, onMenu }) {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="navbar" style={{justifyContent: "right"}}>
         <button className="mobile-menu icon-button" onClick={onMenu}>
           <Menu size={19} />
         </button>
         <div className="nav-actions">
-          <button className="icon-button" aria-label="Notifications">
+          {/* button lonceng notification */}
+          {/* <button className="icon-button" aria-label="Notifications">
             <Bell size={18} />
             <i />
-          </button>
+          </button> */}
           <ThemeToggle />
           <div className="profile-menu">
             <button

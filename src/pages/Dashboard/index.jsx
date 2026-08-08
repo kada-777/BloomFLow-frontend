@@ -1,5 +1,14 @@
 import { useOutletContext } from "react-router-dom";
-import { EmptyState, PageHeader } from "../../components/ui";
+import BranchSelector from "../../components/dashboard/BranchSelector";
+import DashboardHeader from "../../components/dashboard/DashboardHeader";
+import DashboardSkeleton from "../../components/dashboard/DashboardSkeleton";
+import DistributionStatusChart from "../../components/dashboard/DistributionStatusChart";
+import FlowerStatusPieChart from "../../components/dashboard/FlowerStatusPieChart";
+import RecentActivityTable from "../../components/dashboard/RecentActivityTable";
+import RevenueChart from "../../components/dashboard/RevenueChart";
+import SummaryCards from "../../components/dashboard/SummaryCards";
+import TopFlowerSalesChart from "../../components/dashboard/TopFlowerSalesChart";
+import { useDashboard } from "../../hooks/useDashboard";
 
 const roleCopy = {
   "Super Admin": ["Supply chain overview", "Live intelligence across your branch network"],
@@ -11,11 +20,64 @@ export default function Dashboard() {
   const { role } = useOutletContext();
   const [title, subtitle] =
     roleCopy[role] || ["Account access", "Your assigned workspace"];
+  const {
+    data,
+    loading,
+    error,
+    resourceErrors,
+    selectedBranch,
+    setSelectedBranch,
+    refresh,
+    isBranchStaff,
+  } = useDashboard();
 
   return (
-    <>
-      <PageHeader title={title} subtitle={subtitle} action="Export report" />
-      <EmptyState title="Dashboard data will appear once the API is connected." />
-    </>
+    <div className="dashboard-page">
+      <DashboardHeader title={title} subtitle={subtitle} />
+      {error && (
+        <div className="dashboard-alert" role="alert">
+          <span>{error}</span>
+          <button className="text-button" type="button" onClick={refresh}>Retry</button>
+        </div>
+      )}
+      {loading ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          <SummaryCards
+            summary={data.summary}
+            resourceErrors={resourceErrors}
+            onRetry={refresh}
+          />
+          <div className="dashboard-filter-row">
+            <BranchSelector
+              branches={data.branches}
+              selectedBranch={selectedBranch}
+              onChange={setSelectedBranch}
+              disabled={isBranchStaff}
+              loading={loading}
+              error={resourceErrors.branches}
+            />
+          </div>
+          <div className="dashboard-chart-grid">
+            <FlowerStatusPieChart
+              data={data.flowerStatus}
+              loading={loading}
+              error={resourceErrors.branchInventory}
+              onRetry={refresh}
+            />
+            <TopFlowerSalesChart loading={loading} />
+            <RevenueChart loading={loading} />
+            <DistributionStatusChart loading={loading} />
+          </div>
+          <RecentActivityTable
+            activities={data.activities}
+            loading={loading}
+            error={resourceErrors.dailySales || resourceErrors.receivings}
+            onRetry={refresh}
+          />
+        </>
+      )}
+    </div>
   );
 }
