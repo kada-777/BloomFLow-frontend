@@ -13,6 +13,7 @@ import Farms from "./pages/Farms";
 import FlowerCatalog from "./pages/FlowerCatalog";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
+import Receiving from "./pages/Receiving";
 function Protected() {
   const { user, isRestoring } = useAuth();
 
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/farms" element={<Farms />} />
         <Route path="/flower-catalog" element={<FlowerCatalog />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/receiving" element={<Receiving />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
