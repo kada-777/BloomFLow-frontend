@@ -162,8 +162,7 @@ button {
   grid-template-columns: 2fr 1fr;
   gap: 20px;
 }
-.chart-card,
-.table-card {
+.chart-card {
   padding: 21px;
 }
 .card-title {

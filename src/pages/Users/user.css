@@ -273,6 +273,12 @@ thead th:last-child{
     line-height: 1.4;
 }
 
+.user-name small {
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
 /* ==========================
    EMAIL
 ========================== */
@@ -458,7 +464,7 @@ td:last-child {
 
 @media (max-width: 1100px) {
 
-    .table-card {
+.table-card {
 
         overflow-x: auto;
     }
@@ -479,4 +485,24 @@ td:last-child {
 
         width: fit-content;
     }
+}
+
+.user-page-alert {
+    align-items: center;
+    background: #fff1f1;
+    border: 1px solid #f3cccc;
+    border-radius: 12px;
+    color: #a84646;
+    display: flex;
+    font-size: 13px;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding: 12px 15px;
+}
+
+.user-page-state {
+    color: var(--muted);
+    font-size: 14px;
+    padding: 56px 20px;
+    text-align: center;
 }
