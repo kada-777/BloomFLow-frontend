@@ -68,6 +68,7 @@ const menus = {
       "FULFILMENT",
       [
         ["Receiving", Package, "/receiving"],
+        ["Head Office Inventory", Warehouse, "/head-office-inventory"],
         ["Distribution", Truck, "/distribution"],
         ["Quality Control", ShieldCheck, "/quality-control"],
       ],

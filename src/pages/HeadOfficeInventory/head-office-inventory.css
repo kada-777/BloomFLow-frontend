@@ -1,0 +1,117 @@
+.head-office-inventory-page {
+  background: var(--bg);
+  min-height: calc(100vh - 76px);
+  padding: 28px 32px;
+}
+
+.head-office-inventory-page .page-header {
+  margin-bottom: 22px;
+}
+
+.inventory-summary-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 20px;
+}
+
+.head-office-inventory-page .stat-card h3 {
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.head-office-inventory-page .stat-card small {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.inventory-toolbar {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  margin-bottom: 20px;
+}
+
+.inventory-toolbar .generic-search-card {
+  margin: 0;
+}
+
+.inventory-status-filter {
+  color: var(--muted);
+  display: grid;
+  font-size: 11px;
+  font-weight: 700;
+  gap: 6px;
+}
+
+.inventory-status-filter select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  height: 46px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.inventory-unavailable-note {
+  align-items: center;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 7px;
+  margin-bottom: 16px;
+  padding: 11px 13px;
+}
+
+.inventory-unavailable {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.inventory-flower-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 180px;
+  overflow: hidden;
+}
+
+.inventory-flower-cell strong,
+.inventory-flower-cell small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inventory-flower-cell strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.inventory-flower-cell small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.inventory-table-card {
+  overflow-x: auto;
+}
+
+.inventory-table-card table {
+  min-width: 1100px;
+}
+
+@media (max-width: 1050px) {
+  .inventory-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .head-office-inventory-page { padding: 24px 16px; }
+  .inventory-toolbar { grid-template-columns: 1fr; }
+}

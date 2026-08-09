@@ -14,6 +14,7 @@ import FlowerCatalog from "./pages/FlowerCatalog";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import Receiving from "./pages/Receiving";
+import HeadOfficeInventory from "./pages/HeadOfficeInventory";
 function Protected() {
   const { user, isRestoring } = useAuth();
 
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/flower-catalog" element={<FlowerCatalog />} />
         <Route path="/users" element={<Users />} />
         <Route path="/receiving" element={<Receiving />} />
+        <Route path="/head-office-inventory" element={<HeadOfficeInventory />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
