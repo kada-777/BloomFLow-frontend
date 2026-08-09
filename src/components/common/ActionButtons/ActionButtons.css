@@ -1,0 +1,44 @@
+.generic-action-buttons {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.generic-action-buttons button {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.generic-action-buttons .edit-btn,
+.generic-action-buttons .delete-btn {
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  height: 36px;
+  padding: 0 14px;
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.generic-action-buttons .edit-btn {
+  background: #faf8f2;
+  border: 1px solid #d9d2c2;
+  color: #556239;
+}
+
+.generic-action-buttons .delete-btn {
+  background: #fff5f5;
+  border: 1px solid #f1d2d2;
+  color: #c96464;
+}
+
+.generic-action-buttons .edit-btn:hover,
+.generic-action-buttons .delete-btn:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.generic-action-buttons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { Pencil, Search, Trash2, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { getApiError } from "../../services/api";
 import { userService } from "../../services/userService";
+import ActionButtons from "../../components/common/ActionButtons/ActionButtons";
+import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
 import ConfirmDialog from "../../components/common/ConfirmDialog/ConfirmDialog";
+import GenericDataTable from "../../components/common/GenericDataTable/GenericDataTable";
+import SearchBar from "../../components/common/SearchBar/SearchBar";
 import UserFormCard from "../../components/users/UserFormCard/UserFormCard";
 import "./user.css";
 
@@ -154,6 +158,26 @@ export default function UserManagement() {
 
   const filteredUsers = users.filter((user) => matchesSearch(user, searchTerm));
 
+  const columns = [
+    {
+      key: "email",
+      label: "PENGGUNA",
+      render: (user) => (
+        <div className="user-info">
+          <div className="avatar">{getInitials(user)}</div>
+          <div className="user-name">
+            <strong>{getDisplayEmail(user)}</strong>
+            <small>{user.id ? `ID #${user.id}` : ""}</small>
+          </div>
+        </div>
+      ),
+    },
+    { key: "role", label: "ROLE", render: (user) => <span className="role-pill">{roleLabels[user.role] || user.role}</span> },
+    { key: "branch", label: "CABANG", render: (user) => user.branch?.name || (user.role === "STAFF_BRANCH" ? "-" : "Head Office") },
+    { key: "lastLogin", label: "LOGIN TERAKHIR", render: () => "-" },
+    { key: "isActive", label: "STATUS", render: (user) => <span className={`status ${user.isActive ? "active" : "inactive"}`}>{user.isActive ? "Aktif" : "Nonaktif"}</span> },
+  ];
+
   return (
     <div className="user-page">
       <div className="page-header">
@@ -167,77 +191,22 @@ export default function UserManagement() {
         </button>
       </div>
 
-      <div className="search-card">
-        <div className="search-input">
-          <Search size={20} />
-          <input
-            type="search"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Cari email, role, cabang..."
-            aria-label="Cari pengguna"
+      <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Cari email, role, cabang..." ariaLabel="Cari pengguna" />
+
+      <ActionNotice message={pageError} tone="error" onAction={loadData} onClose={() => setPageError("")} />
+
+      <GenericDataTable
+        columns={columns}
+        data={filteredUsers}
+        loading={loading}
+        emptyMessage="Belum ada pengguna yang cocok."
+        renderActions={(user) => (
+          <ActionButtons
+            onEdit={() => openEditForm(user)}
+            onDelete={user.isActive ? () => openDeleteDialog(user) : undefined}
           />
-        </div>
-      </div>
-
-      {pageError && (
-        <div className="user-page-alert" role="alert">
-          <span>{pageError}</span>
-          <button className="text-button" type="button" onClick={loadData}>Coba lagi</button>
-        </div>
-      )}
-
-      <div className="table-card">
-        {loading ? (
-          <div className="user-page-state">Memuat data pengguna...</div>
-        ) : filteredUsers.length === 0 ? (
-          <div className="user-page-state">Belum ada pengguna yang cocok.</div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>PENGGUNA</th>
-                <th>ROLE</th>
-                <th>CABANG</th>
-                <th>LOGIN TERAKHIR</th>
-                <th>STATUS</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user.id}>
-                  <td>
-                    <div className="user-info">
-                      <div className="avatar">{getInitials(user)}</div>
-                      <div className="user-name">
-                        <strong>{getDisplayEmail(user)}</strong>
-                        <small>{user.id ? `ID #${user.id}` : ""}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span className="role-pill">{roleLabels[user.role] || user.role}</span></td>
-                  <td>{user.branch?.name || (user.role === "STAFF_BRANCH" ? "-" : "Head Office")}</td>
-                  <td>-</td>
-                  <td><span className={`status ${user.isActive ? "active" : "inactive"}`}>{user.isActive ? "Aktif" : "Nonaktif"}</span></td>
-                  <td>
-                    <div className="action-buttons">
-                      <button className="edit-btn" type="button" onClick={() => openEditForm(user)}>
-                        <Pencil size={16} /> Edit
-                      </button>
-                      {user.isActive && (
-                        <button className="delete-btn" type="button" onClick={() => openDeleteDialog(user)}>
-                          <Trash2 size={16} /> Hapus
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         )}
-      </div>
+      />
 
       <UserFormCard
         open={formOpen}
