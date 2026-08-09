@@ -29,15 +29,6 @@ const menus = {
       ],
     ],
     [
-      "SUPPLY CHAIN",
-      [
-        ["Inventory", Package, "/inventory"],
-        ["Distribution", Truck, "/distribution"],
-        ["Forecasting", Sparkles, "/forecasting"],
-        ["Quality Control", ShieldCheck, "/quality-control"],
-      ],
-    ],
-    [
       "MASTER DATA",
       [
         ["Users", Users, "/users"],
@@ -46,6 +37,16 @@ const menus = {
         ["Flower Catalog", Flower2, "/flower-catalog"],
       ],
     ],
+    [
+      "SUPPLY CHAIN",
+      [
+        ["Inventory", Package, "/inventory"],
+        ["Distribution", Truck, "/distribution"],
+        ["Forecasting", Sparkles, "/forecasting"],
+        ["Quality Control", ShieldCheck, "/quality-control"],
+      ],
+    ],
+    
     [
       "ADMINISTRATION",
       [
