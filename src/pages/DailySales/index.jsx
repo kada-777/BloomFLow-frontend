@@ -10,6 +10,10 @@ function formatDate(value) {
   return new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(value));
 }
 
+function formatQuantity(value) {
+  return Number(value).toLocaleString("id-ID", { maximumFractionDigits: 2 });
+}
+
 export default function DailySales() {
   const dailySales = useDailySales();
 
@@ -29,9 +33,8 @@ export default function DailySales() {
 
   const columns = [
     { key: "salesDate", label: "Date", render: (row) => formatDate(row.salesDate) },
-    { key: "flowerName", label: "Flower" },
-    { key: "soldQuantity", label: "Sold Qty" },
-    { key: "damagedQuantity", label: "Damaged Qty" },
+    { key: "soldQuantity", label: "Sold Qty", render: (row) => formatQuantity(row.soldQuantity) },
+    { key: "damagedQuantity", label: "Damaged Qty", render: (row) => formatQuantity(row.damagedQuantity) },
     {
       key: "action",
       label: "Action",

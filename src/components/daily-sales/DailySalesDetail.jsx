@@ -27,11 +27,11 @@ export default function DailySalesDetail({ open, detail, loading, error, onClose
               <div className="daily-sales-detail-date"><span>TANGGAL SALES</span><strong>{formatDate(detail.salesDate)}</strong></div>
               <div className="daily-sales-detail-table-wrap">
                 <table className="daily-sales-detail-table">
-                  <thead><tr><th>Flower</th><th>Sold Qty</th><th>Damaged Qty</th></tr></thead>
+                 <thead><tr><th>Variety</th><th>Sold Qty</th><th>Damaged Qty</th></tr></thead>
                   <tbody>
                     {(detail.items || []).map((item, index) => (
                       <tr key={item.id || `${item.flowerId}-${index}`}>
-                        <td>{item.flower?.name || item.flowerName || "-"}</td>
+                         <td>{item.flower?.variety || item.flower?.name || item.flowerName || "-"}</td>
                         <td>{item.soldQuantity ?? "-"}</td>
                         <td>{item.damagedQuantity ?? "-"}</td>
                       </tr>

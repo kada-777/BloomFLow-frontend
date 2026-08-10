@@ -81,15 +81,24 @@ function normalizePayload(payload) {
   };
 }
 
-function flattenSales(sales) {
-  return sales.flatMap((sale) => (sale.items || []).map((item) => ({
-    rowId: `${sale.id}-${item.id}`,
-    saleId: sale.id,
-    salesDate: sale.salesDate,
-    flowerName: item.flower?.name || `Flower #${item.flowerId}`,
-    soldQuantity: item.soldQuantity,
-    damagedQuantity: item.damagedQuantity,
-  })));
+function summarizeSales(sales) {
+  return sales.map((sale) => {
+    const items = sale.items || [];
+    const varieties = [...new Set(items.map((item) => (
+      item.flower?.variety || item.flower?.name || `Flower #${item.flowerId}`
+    )))];
+    const soldQuantity = items.reduce((total, item) => total + Number(item.soldQuantity || 0), 0);
+    const damagedQuantity = items.reduce((total, item) => total + Number(item.damagedQuantity || 0), 0);
+
+    return {
+      rowId: sale.id,
+      saleId: sale.id,
+      salesDate: sale.salesDate,
+      variety: varieties.join(", ") || "-",
+      soldQuantity,
+      damagedQuantity,
+    };
+  });
 }
 
 export default function useDailySales() {
@@ -195,7 +204,7 @@ export default function useDailySales() {
 
   return {
     sales,
-    tableRows: flattenSales(sales),
+    tableRows: summarizeSales(sales),
     flowers,
     loading,
     error,
