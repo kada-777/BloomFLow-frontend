@@ -15,6 +15,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight, Warehouse,
+  ReceiptText,
 } from "lucide-react";
 import logo from "../assets/Logo.png";
 import { Navbar } from "../components/ui";
@@ -88,6 +89,7 @@ const menus = {
         ["Dashboard", LayoutDashboard, "/"],
         ["Inventory", Package, "/inventory"],
         ["Distribution", Truck, "/distribution"],
+        ["Daily Sales", ReceiptText, "/daily-sales"],
       ],
     ],
     [
