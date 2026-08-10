@@ -70,15 +70,6 @@ const menus = {
       [
         ["Receiving", Package, "/receiving"],
         ["Distribution", Truck, "/distribution"],
-        ["Quality Control", ShieldCheck, "/quality-control"],
-      ],
-    ],
-    [
-      "NETWORK",
-      [
-        ["Branches", MapPin, "/branches"],
-        ["Farms", Sprout, "/farms"],
-        ["Flower Catalog", Flower2, "/flower-catalog"],
       ],
     ],
   ],
@@ -96,14 +87,6 @@ const menus = {
       "FRESHNESS",
       [
         ["Quality Control", ShieldCheck, "/quality-control"],
-        ["Flower Catalog", Flower2, "/flower-catalog"],
-      ],
-    ],
-    [
-      "REFERENCE",
-      [
-        ["Branches", MapPin, "/branches"],
-        ["Settings", Settings, "/settings"],
       ],
     ],
   ],
