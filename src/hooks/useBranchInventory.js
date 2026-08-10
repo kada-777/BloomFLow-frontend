@@ -18,13 +18,12 @@ function buildRows(entries) {
     const totals = (entry.lots || []).reduce(
       (summary, lot) => {
         const amount = quantity(lot.quantity);
-        summary.available += amount;
         if (lot.flowerStatus === "FRESH") summary.fresh += amount;
         if (lot.flowerStatus === "GRADE_C") summary.gradeC += amount;
         if (lot.flowerStatus === "DAMAGED") summary.damaged += amount;
         return summary;
       },
-      { fresh: 0, gradeC: 0, damaged: 0, available: 0 },
+      { fresh: 0, gradeC: 0, damaged: 0 },
     );
 
     return {
@@ -32,6 +31,7 @@ function buildRows(entries) {
       flowerId: entry.flowerId,
       flowerName: entry.flowerName || `Flower #${entry.flowerId}`,
       variety: entry.variety,
+      available: totals.fresh + totals.gradeC,
       ...totals,
     };
   });
