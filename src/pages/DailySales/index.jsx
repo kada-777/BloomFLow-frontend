@@ -1,0 +1,94 @@
+import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
+import GenericDataTable from "../../components/common/GenericDataTable/GenericDataTable";
+import DailySalesDetail from "../../components/daily-sales/DailySalesDetail";
+import DailySalesForm from "../../components/daily-sales/DailySalesForm";
+import useDailySales, { emptyDailySalesItem } from "../../hooks/useDailySales";
+import "./daily-sales.css";
+
+function formatDate(value) {
+  if (!value) return "-";
+  return new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(value));
+}
+
+export default function DailySales() {
+  const dailySales = useDailySales();
+
+  const handleFormChange = (fieldOrIndex, valueOrField, itemValue) => {
+    if (typeof fieldOrIndex === "number") {
+      dailySales.setForm((current) => ({
+        ...current,
+        items: current.items.map((item, index) => (
+          index === fieldOrIndex ? { ...item, [valueOrField]: itemValue } : item
+        )),
+      }));
+      return;
+    }
+
+    dailySales.setForm((current) => ({ ...current, [fieldOrIndex]: valueOrField }));
+  };
+
+  const columns = [
+    { key: "salesDate", label: "Date", render: (row) => formatDate(row.salesDate) },
+    { key: "flowerName", label: "Flower" },
+    { key: "soldQuantity", label: "Sold Qty" },
+    { key: "damagedQuantity", label: "Damaged Qty" },
+    {
+      key: "action",
+      label: "Action",
+      render: (row) => (
+        <button className="daily-sales-view-button" type="button" onClick={() => dailySales.openDetail(row.saleId)}>
+          View Detail
+        </button>
+      ),
+    },
+  ];
+
+  return (
+    <div className="daily-sales-page">
+      <header className="daily-sales-page-header">
+        <div>
+          <p className="daily-sales-page-eyebrow">BRANCH OPERATIONS</p>
+          <h1>Most Recent Sales</h1>
+          <p>Record and review daily flower sales for your branch.</p>
+        </div>
+        <button className="button" type="button" onClick={dailySales.openCreate}>Add Sales</button>
+      </header>
+
+      <ActionNotice message={dailySales.error} tone="error" onAction={dailySales.refresh} />
+      <ActionNotice message={dailySales.successMessage} onClose={() => dailySales.setSuccessMessage("")} />
+
+      <GenericDataTable
+        columns={columns}
+        data={dailySales.tableRows}
+        loading={dailySales.loading}
+        emptyMessage="Belum ada data daily sales."
+        className="daily-sales-table-card table-card"
+        rowKey={(row) => row.rowId}
+      />
+
+      <DailySalesForm
+        open={dailySales.formOpen}
+        form={dailySales.form}
+        flowers={dailySales.flowers}
+        onChange={handleFormChange}
+        onAddItem={() => dailySales.setForm((current) => ({ ...current, items: [...current.items, emptyDailySalesItem()] }))}
+        onRemoveItem={(index) => dailySales.setForm((current) => ({
+          ...current,
+          items: current.items.filter((_, itemIndex) => itemIndex !== index),
+        }))}
+        onSubmit={dailySales.submitCreate}
+        onClose={dailySales.closeCreate}
+        submitting={dailySales.submitting}
+        error={dailySales.formError}
+      />
+
+      <DailySalesDetail
+        open={dailySales.detailOpen}
+        detail={dailySales.detail}
+        loading={dailySales.detailLoading}
+        error={dailySales.detailError}
+        onClose={dailySales.closeDetail}
+      />
+    </div>
+  );
+}
