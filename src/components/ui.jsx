@@ -87,7 +87,7 @@ export function Navbar({ role, onMenu }) {
 
   return (
     <>
-      <nav className="navbar" style={{justifyContent: "right"}}>
+      <nav className="navbar" style={{ justifyContent: "right" }}>
         <button className="mobile-menu icon-button" onClick={onMenu}>
           <Menu size={19} />
         </button>
@@ -105,10 +105,7 @@ export function Navbar({ role, onMenu }) {
               onClick={() => setIsProfileOpen((current) => !current)}
             >
               <b>{user?.name?.slice(0, 1) || "A"}</b>
-              <span>
-                {user?.name || "User"}
-                <small>{role}</small>
-              </span>
+              <span>{role}</span>
               <ChevronDown size={15} />
             </button>
             {isProfileOpen && (
@@ -128,7 +125,10 @@ export function Navbar({ role, onMenu }) {
         </div>
       </nav>
       {isLogoutConfirmOpen && (
-        <div className="modal-backdrop" onClick={() => setIsLogoutConfirmOpen(false)}>
+        <div
+          className="modal-backdrop"
+          onClick={() => setIsLogoutConfirmOpen(false)}
+        >
           <section
             className="confirm-dialog"
             role="dialog"

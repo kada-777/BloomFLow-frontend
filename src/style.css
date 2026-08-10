@@ -562,6 +562,11 @@ tr:last-child td {
   align-items: center;
   margin-bottom: 45px;
 }
+.login-brand-logo {
+  height: 32px;
+  object-fit: contain;
+  width: 32px;
+}
 .login-card h2 {
   font: 700 24px "Plus Jakarta Sans";
   margin: 0 0 9px;

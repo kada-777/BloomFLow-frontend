@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { ArrowRight, Flower2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ThemeToggle } from "../../components/ui";
 import { useAuth } from "../../contexts/AuthContext";
+import logo from "../../assets/Logo.png";
 
 export default function Auth() {
   const { user, login, isRestoring } = useAuth();
@@ -31,9 +32,6 @@ export default function Auth() {
   return (
     <main className="auth">
       <div className="auth-copy">
-        <div className="brand">
-          <Flower2 /> BloomFlow
-        </div>
         <p className="eyebrow">FLOW WITH CLARITY</p>
         <h1>Freshness-led operations, beautifully managed.</h1>
         <p>
@@ -48,7 +46,8 @@ export default function Auth() {
       <section className="login-card">
         <div className="login-top">
           <div className="brand">
-            <Flower2 /> BloomFlow
+            <img className="login-brand-logo" src={logo} alt="BloomFlow Logo" />
+            <span>BloomFlow</span>
           </div>
           <ThemeToggle />
         </div>
