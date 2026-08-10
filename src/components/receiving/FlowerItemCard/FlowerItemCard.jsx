@@ -27,9 +27,9 @@ export default function FlowerItemCard({ index, item, flowers, errors = {}, read
 
       <div className="flower-item-grid">
         <label className="flower-item-field flower-item-field-wide">
-          <span>Flower</span>
+          <span>{readOnly ? "Variety" : "Flower"}</span>
           {readOnly ? (
-            <div className="flower-item-readonly">{item.flower?.name || item.flowerName || item.flowerId || "-"}</div>
+            <div className="flower-item-readonly">{item.flower?.variety || item.flower?.name || item.flowerName || item.flowerId || "-"}</div>
           ) : (
             <select value={item.flowerId} onChange={(event) => onChange("flowerId", event.target.value)}>
               <option value="">Pilih flower</option>
