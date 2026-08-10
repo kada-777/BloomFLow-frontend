@@ -72,7 +72,7 @@ export function SearchBar({ value, onChange }) {
     </label>
   );
 }
-export function Navbar({ role, onMenu }) {
+export function Navbar({ onMenu }) {
   const { user, logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
@@ -104,8 +104,8 @@ export function Navbar({ role, onMenu }) {
               aria-expanded={isProfileOpen}
               onClick={() => setIsProfileOpen((current) => !current)}
             >
-              <b>{user?.name?.slice(0, 1) || "A"}</b>
-              <span>{role}</span>
+              <b>{user?.email?.slice(0, 1).toUpperCase() || "A"}</b>
+              <span>{user?.email || ""}</span>
               <ChevronDown size={15} />
             </button>
             {isProfileOpen && (

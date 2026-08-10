@@ -185,7 +185,7 @@ export default function AppLayout() {
       </button>
       {open && <div className="scrim" onClick={() => setOpen(false)} />}
       <main>
-        <Navbar role={role} onMenu={() => setOpen(true)} />
+        <Navbar onMenu={() => setOpen(true)} />
         <div className="content">
           <Outlet context={{ role }} />
         </div>
