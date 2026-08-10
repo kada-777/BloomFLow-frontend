@@ -27,25 +27,24 @@ function getDisplayEmail(user) {
 }
 
 function getInitials(user) {
-  return getDisplayEmail(user)
-    .split("@")[0]
-    .split(/[._-]/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase() || "U";
+  return (
+    getDisplayEmail(user)
+      .split("@")[0]
+      .split(/[._-]/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "U"
+  );
 }
 
 function matchesSearch(user, searchTerm) {
   const query = searchTerm.trim().toLowerCase();
   if (!query) return true;
-  return [
-    user.email,
-    user.role,
-    roleLabels[user.role],
-    user.branch?.name,
-  ].filter(Boolean).some((value) => value.toLowerCase().includes(query));
+  return [user.email, user.role, roleLabels[user.role], user.branch?.name]
+    .filter(Boolean)
+    .some((value) => value.toLowerCase().includes(query));
 }
 
 export default function UserManagement() {
@@ -81,7 +80,10 @@ export default function UserManagement() {
     if (branchesResult.status === "fulfilled") {
       setBranches(normalizeList(branchesResult.value));
     } else {
-      setPageError((current) => current || getApiError(branchesResult.reason, "Cabang gagal dimuat."));
+      setPageError(
+        (current) =>
+          current || getApiError(branchesResult.reason, "Cabang gagal dimuat."),
+      );
     }
 
     setLoading(false);
@@ -167,15 +169,33 @@ export default function UserManagement() {
           <div className="avatar">{getInitials(user)}</div>
           <div className="user-name">
             <strong>{getDisplayEmail(user)}</strong>
-            <small>{user.id ? `ID #${user.id}` : ""}</small>
           </div>
         </div>
       ),
     },
-    { key: "role", label: "ROLE", render: (user) => <span className="role-pill">{roleLabels[user.role] || user.role}</span> },
-    { key: "branch", label: "CABANG", render: (user) => user.branch?.name || (user.role === "STAFF_BRANCH" ? "-" : "Head Office") },
-    { key: "lastLogin", label: "LOGIN TERAKHIR", render: () => "-" },
-    { key: "isActive", label: "STATUS", render: (user) => <span className={`status ${user.isActive ? "active" : "inactive"}`}>{user.isActive ? "Aktif" : "Nonaktif"}</span> },
+    {
+      key: "role",
+      label: "ROLE",
+      render: (user) => (
+        <span className="role-pill">{roleLabels[user.role] || user.role}</span>
+      ),
+    },
+    {
+      key: "branch",
+      label: "CABANG",
+      render: (user) =>
+        user.branch?.name ||
+        (user.role === "STAFF_BRANCH" ? "-" : "Head Office"),
+    },
+    {
+      key: "isActive",
+      label: "STATUS",
+      render: (user) => (
+        <span className={`status ${user.isActive ? "active" : "inactive"}`}>
+          {user.isActive ? "Aktif" : "Nonaktif"}
+        </span>
+      ),
+    },
   ];
 
   return (
@@ -191,9 +211,19 @@ export default function UserManagement() {
         </button>
       </div>
 
-      <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Cari email, role, cabang..." ariaLabel="Cari pengguna" />
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Cari email, role, cabang..."
+        ariaLabel="Cari pengguna"
+      />
 
-      <ActionNotice message={pageError} tone="error" onAction={loadData} onClose={() => setPageError("")} />
+      <ActionNotice
+        message={pageError}
+        tone="error"
+        onAction={loadData}
+        onClose={() => setPageError("")}
+      />
 
       <GenericDataTable
         columns={columns}
@@ -222,7 +252,10 @@ export default function UserManagement() {
       <ConfirmDialog
         open={deleteOpen}
         title="Hapus Pengguna?"
-        message={deleteError || "Pengguna akan dinonaktifkan dan tidak dapat mengakses aplikasi lagi."}
+        message={
+          deleteError ||
+          "Pengguna akan dinonaktifkan dan tidak dapat mengakses aplikasi lagi."
+        }
         confirmText="Hapus"
         cancelText="Batal"
         danger
