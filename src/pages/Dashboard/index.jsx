@@ -8,6 +8,7 @@ import RecentActivityTable from "../../components/dashboard/RecentActivityTable"
 import RevenueChart from "../../components/dashboard/RevenueChart";
 import SummaryCards from "../../components/dashboard/SummaryCards";
 import TopFlowerSalesChart from "../../components/dashboard/TopFlowerSalesChart";
+import { useAuth } from "../../contexts/AuthContext";
 import { useDashboard } from "../../hooks/useDashboard";
 
 const roleCopy = {
@@ -18,7 +19,8 @@ const roleCopy = {
 
 export default function Dashboard() {
   const { role } = useOutletContext();
-  const [title, subtitle] =
+  const { user } = useAuth();
+  const [defaultTitle, subtitle] =
     roleCopy[role] || ["Account access", "Your assigned workspace"];
   const {
     data,
@@ -30,6 +32,9 @@ export default function Dashboard() {
     refresh,
     isBranchStaff,
   } = useDashboard();
+  const title = isBranchStaff
+    ? `Welcome, ${user?.branch?.name || "My Branch"}`
+    : defaultTitle;
 
   return (
     <div className="dashboard-page">
@@ -49,16 +54,18 @@ export default function Dashboard() {
             resourceErrors={resourceErrors}
             onRetry={refresh}
           />
-          <div className="dashboard-filter-row">
-            <BranchSelector
-              branches={data.branches}
-              selectedBranch={selectedBranch}
-              onChange={setSelectedBranch}
-              disabled={isBranchStaff}
-              loading={loading}
-              error={resourceErrors.branches}
-            />
-          </div>
+          {!isBranchStaff && (
+            <div className="dashboard-filter-row">
+              <BranchSelector
+                branches={data.branches}
+                selectedBranch={selectedBranch}
+                onChange={setSelectedBranch}
+                disabled={isBranchStaff}
+                loading={loading}
+                error={resourceErrors.branches}
+              />
+            </div>
+          )}
           <div className="dashboard-chart-grid">
             <FlowerStatusPieChart
               data={data.flowerStatus}
