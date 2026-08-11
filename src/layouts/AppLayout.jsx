@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard,
   Package,
@@ -12,8 +13,11 @@ import {
   Flower2,
   Users,
   Settings,
-  PanelLeftClose,
+  ChevronLeft,
+  ChevronRight, Warehouse,
+  ReceiptText,
 } from "lucide-react";
+import logo from "../assets/Logo.png";
 import { Navbar } from "../components/ui";
 import "../nav.css";
 const menus = {
@@ -26,6 +30,15 @@ const menus = {
       ],
     ],
     [
+      "MASTER DATA",
+      [
+        ["Users", Users, "/users"],
+        ["Branches", MapPin, "/branches"],
+        ["Farms", Sprout, "/farms"],
+        ["Flower Catalog", Flower2, "/flower-catalog"],
+      ],
+    ],
+    [
       "SUPPLY CHAIN",
       [
         ["Inventory", Package, "/inventory"],
@@ -34,18 +47,11 @@ const menus = {
         ["Quality Control", ShieldCheck, "/quality-control"],
       ],
     ],
-    [
-      "MASTER DATA",
-      [
-        ["Branches", MapPin, "/branches"],
-        ["Farms", Sprout, "/farms"],
-        ["Flower Catalog", Flower2, "/flower-catalog"],
-      ],
-    ],
+    
     [
       "ADMINISTRATION",
       [
-        ["Users", Users, "/users"],
+        
         ["Settings", Settings, "/settings"],
       ],
     ],
@@ -62,17 +68,8 @@ const menus = {
     [
       "FULFILMENT",
       [
-        ["Inventory", Package, "/inventory"],
+        ["Receiving", Package, "/receiving"],
         ["Distribution", Truck, "/distribution"],
-        ["Quality Control", ShieldCheck, "/quality-control"],
-      ],
-    ],
-    [
-      "NETWORK",
-      [
-        ["Branches", MapPin, "/branches"],
-        ["Farms", Sprout, "/farms"],
-        ["Flower Catalog", Flower2, "/flower-catalog"],
       ],
     ],
   ],
@@ -83,64 +80,97 @@ const menus = {
         ["Dashboard", LayoutDashboard, "/"],
         ["Inventory", Package, "/inventory"],
         ["Distribution", Truck, "/distribution"],
+        ["Daily Sales", ReceiptText, "/daily-sales"],
       ],
     ],
     [
       "FRESHNESS",
       [
         ["Quality Control", ShieldCheck, "/quality-control"],
-        ["Flower Catalog", Flower2, "/flower-catalog"],
-      ],
-    ],
-    [
-      "REFERENCE",
-      [
-        ["Branches", MapPin, "/branches"],
-        ["Settings", Settings, "/settings"],
       ],
     ],
   ],
 };
+
+const roleLabels = {
+  SUPERADMIN: "Super Admin",
+  STAFF_HEAD_OFFICE: "Head Office",
+  STAFF_BRANCH: "Branch Staff",
+};
+
+const SIDEBAR_COLLAPSED_KEY = "bloomflow.sidebar.collapsed";
+
+function getInitialSidebarCollapsed() {
+  const stored = window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+  if (stored === "true" || stored === "false") return stored === "true";
+  return window.matchMedia("(max-width: 1024px)").matches;
+}
+
 export default function AppLayout() {
-  const [role, setRole] = useState("Super Admin");
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(getInitialSidebarCollapsed);
+
+  useEffect(() => {
+    window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(isCollapsed));
+  }, [isCollapsed]);
+
+  const role = roleLabels[user?.role?.toUpperCase()] || "Unknown role";
+  const roleMenus = menus[role] || [];
+
   return (
-    <div className="shell">
-      <aside className={open ? "open" : ""}>
+    <div className={`shell ${isCollapsed ? "sidebar-collapsed" : ""}`}>
+      <aside className={`${isCollapsed ? "collapsed" : ""} ${open ? "open" : ""}`}>
         <div className="brand">
-          <Flower2 /> <span>BloomFlow</span>
-          <button onClick={() => setOpen(false)}>
-            <PanelLeftClose size={18} />
+          <img
+            className="brand-logo"
+            src={logo}
+            alt="BloomFlow Logo"
+          />
+          <span>BloomFlow</span>
+          <button
+            className="sidebar-mobile-close"
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <ChevronLeft size={18} />
           </button>
         </div>
-        <p className="workspace">{role} VIEW</p>
-        {menus[role].map(([group, items]) => (
-          <section className="nav-group" key={group}>
-            <p>{group}</p>
-            {items.map(([name, Icon, path]) => (
-              <NavLink
-                key={name}
-                to={path}
-                end={path === "/"}
-                onClick={() => setOpen(false)}
-              >
-                <Icon size={18} />
-                <span>{name}</span>
-              </NavLink>
-            ))}
-          </section>
-        ))}
-        <div className="sidebar-note">
-          <span>Supply health</span>
-          <b>92% on track</b>
-          <div>
-            <i />
-          </div>
+        <div className="sidebar-menu">
+          {roleMenus.map(([group, items]) => (
+            <section className="nav-group" key={group}>
+              <p>{group}</p>
+              {items.map(([name, Icon, path]) => (
+                <NavLink
+                  className="sidebar-link"
+                  key={name}
+                  to={path}
+                  end={path === "/"}
+                  onClick={() => setOpen(false)}
+                  title={name}
+                  data-tooltip={name}
+                >
+                  <Icon size={18} />
+                  <span>{name}</span>
+                </NavLink>
+              ))}
+            </section>
+          ))}
         </div>
       </aside>
+      <button
+        className="sidebar-toggle"
+        type="button"
+        onClick={() => setIsCollapsed((value) => !value)}
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        aria-expanded={!isCollapsed}
+      >
+        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+      </button>
       {open && <div className="scrim" onClick={() => setOpen(false)} />}
       <main>
-        <Navbar role={role} setRole={setRole} onMenu={() => setOpen(true)} />
+        <Navbar onMenu={() => setOpen(true)} />
         <div className="content">
           <Outlet context={{ role }} />
         </div>

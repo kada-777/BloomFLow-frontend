@@ -4,6 +4,7 @@ import AppLayout from "./layouts/AppLayout";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
+import BatchDetail from "./pages/Inventory/BatchDetail";
 import Distribution from "./pages/Distribution";
 import Forecasting from "./pages/Forecasting";
 import Analytics from "./pages/Analytics";
@@ -13,8 +14,14 @@ import Farms from "./pages/Farms";
 import FlowerCatalog from "./pages/FlowerCatalog";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
+import Receiving from "./pages/Receiving";
+import DailySales from "./pages/DailySales";
 function Protected() {
-  return useAuth().user ? <AppLayout /> : <Navigate to="/auth" replace />;
+  const { user, isRestoring } = useAuth();
+
+  if (isRestoring) return null;
+
+  return user ? <AppLayout /> : <Navigate to="/auth" replace />;
 }
 export default function App() {
   return (
@@ -22,6 +29,7 @@ export default function App() {
       <Route path="/auth" element={<Auth />} />
       <Route element={<Protected />}>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/inventory/:flowerId" element={<BatchDetail />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/distribution" element={<Distribution />} />
         <Route path="/forecasting" element={<Forecasting />} />
@@ -31,6 +39,8 @@ export default function App() {
         <Route path="/farms" element={<Farms />} />
         <Route path="/flower-catalog" element={<FlowerCatalog />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/receiving" element={<Receiving />} />
+        <Route path="/daily-sales" element={<DailySales />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -71,38 +72,92 @@ export function SearchBar({ value, onChange }) {
     </label>
   );
 }
-export function Navbar({ role, setRole, onMenu }) {
+export function Navbar({ onMenu }) {
   const { user, logout } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    setIsLogoutConfirmOpen(false);
+    setIsLoggingOut(false);
+  };
+
   return (
-    <nav className="navbar">
-      <button className="mobile-menu icon-button" onClick={onMenu}>
-        <Menu size={19} />
-      </button>
-      <SearchBar value="" onChange={() => {}} />
-      <div className="nav-actions">
-        <button className="icon-button">
-          <Bell size={18} />
-          <i />
+    <>
+      <nav className="navbar" style={{ justifyContent: "right" }}>
+        <button className="mobile-menu icon-button" onClick={onMenu}>
+          <Menu size={19} />
         </button>
-        <ThemeToggle />
-        <div className="role-select">
-          <Flower2 size={16} />
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            {["Super Admin", "Head Office", "Branch Staff"].map((x) => (
-              <option key={x}>{x}</option>
-            ))}
-          </select>
-          <ChevronDown size={14} />
+        <div className="nav-actions">
+          {/* button lonceng notification */}
+          {/* <button className="icon-button" aria-label="Notifications">
+            <Bell size={18} />
+            <i />
+          </button> */}
+          <ThemeToggle />
+          <div className="profile-menu">
+            <button
+              className="user-pill"
+              aria-expanded={isProfileOpen}
+              onClick={() => setIsProfileOpen((current) => !current)}
+            >
+              <b>{user?.email?.slice(0, 1).toUpperCase() || "A"}</b>
+              <span>{user?.email || ""}</span>
+              <ChevronDown size={15} />
+            </button>
+            {isProfileOpen && (
+              <div className="profile-dropdown">
+                <button
+                  className="logout-menu-item"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    setIsLogoutConfirmOpen(true);
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <button className="user-pill" onClick={logout}>
-          <b>{user?.name?.slice(0, 1) || "A"}</b>
-          <span>
-            {user?.name || "Admin"}
-            <small>{role}</small>
-          </span>
-        </button>
-      </div>
-    </nav>
+      </nav>
+      {isLogoutConfirmOpen && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setIsLogoutConfirmOpen(false)}
+        >
+          <section
+            className="confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="logout-title">Logout from BloomFlow?</h2>
+            <p>You will need to sign in again to access your workspace.</p>
+            <div className="confirm-actions">
+              <button
+                className="text-button"
+                onClick={() => setIsLogoutConfirmOpen(false)}
+                disabled={isLoggingOut}
+              >
+                Cancel
+              </button>
+              <button
+                className="button logout-button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+    </>
   );
 }
 export function EmptyState({ title = "Nothing to show yet" }) {

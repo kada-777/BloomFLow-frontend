@@ -1,0 +1,215 @@
+.user-form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px #2e211e28;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 34px 38px 30px;
+}
+
+.user-form-header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 24px;
+}
+
+.user-form-eyebrow {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.user-form-heading h2 {
+  color: var(--text);
+  font: 700 30px/1.15 "Plus Jakarta Sans";
+  letter-spacing: -0.04em;
+  margin: 9px 0 7px;
+}
+
+.user-form-heading p {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0;
+}
+
+.user-form-close {
+  align-items: center;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--muted);
+  display: grid;
+  height: 40px;
+  justify-content: center;
+  transition: color 180ms ease, transform 180ms ease, background 180ms ease;
+  width: 40px;
+}
+
+.user-form-close:hover {
+  background: var(--border);
+  color: var(--text);
+  transform: rotate(4deg) scale(1.04);
+}
+
+.user-form-body {
+  display: grid;
+  gap: 20px;
+  padding: 28px 0 25px;
+}
+
+.user-form-error {
+  background: #fff1f1;
+  border: 1px solid #f3cccc;
+  border-radius: 11px;
+  color: #a84646;
+  font-size: 13px;
+  padding: 12px 14px;
+}
+
+.user-form-field {
+  color: var(--text);
+  display: grid;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.user-form-field > span {
+  align-items: center;
+  display: flex;
+  gap: 5px;
+}
+
+.user-form-field input,
+.user-form-field select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 15px;
+  height: 54px;
+  outline: none;
+  padding: 0 15px;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  width: 100%;
+}
+
+.user-form-field input:focus,
+.user-form-field select:focus {
+  background: var(--card);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px #b76e7920;
+}
+
+.user-form-field input:disabled,
+.user-form-field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.user-form-input-wrap {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.user-form-input-wrap svg {
+  color: var(--muted);
+  left: 15px;
+  pointer-events: none;
+  position: absolute;
+}
+
+.user-form-input-wrap input {
+  padding-left: 45px;
+}
+
+.user-form-field small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: -2px;
+}
+
+.user-form-field em {
+  color: #a84646;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.user-form-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.user-form-footer {
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 22px;
+}
+
+.user-form-secondary,
+.user-form-primary {
+  align-items: center;
+  border-radius: 11px;
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 600;
+  gap: 7px;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  transition: box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.user-form-secondary {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.user-form-primary {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+}
+
+.user-form-secondary:hover,
+.user-form-primary:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.user-form-secondary:disabled,
+.user-form-primary:disabled {
+  cursor: wait;
+  opacity: 0.58;
+  transform: none;
+}
+
+@media (max-width: 600px) {
+  .user-form-card {
+    border-radius: 17px;
+    padding: 24px 18px 20px;
+  }
+
+  .user-form-heading h2 {
+    font-size: 24px;
+  }
+
+  .user-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-form-footer > button {
+    flex: 1;
+  }
+}

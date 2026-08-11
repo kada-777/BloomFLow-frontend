@@ -1,0 +1,124 @@
+.confirm-dialog-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 24px 70px #2e211e28;
+  max-width: 430px;
+  padding: 30px;
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+.confirm-dialog-close {
+  align-items: center;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--muted);
+  display: grid;
+  height: 34px;
+  justify-content: center;
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  transition: background 180ms ease, color 180ms ease;
+  width: 34px;
+}
+
+.confirm-dialog-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.confirm-dialog-icon {
+  align-items: center;
+  background: #fcf2dc;
+  border-radius: 50%;
+  color: #9a721b;
+  display: inline-flex;
+  height: 62px;
+  justify-content: center;
+  margin: 7px auto 19px;
+  width: 62px;
+}
+
+.confirm-dialog-icon.is-danger {
+  background: #fff1f1;
+  color: #c75c5c;
+}
+
+.confirm-dialog-card h2 {
+  color: var(--text);
+  font: 700 22px "Plus Jakarta Sans";
+  margin: 0 0 9px;
+}
+
+.confirm-dialog-card p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 330px;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.confirm-dialog-cancel,
+.confirm-dialog-confirm {
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0 18px;
+  transition: box-shadow 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.confirm-dialog-cancel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.confirm-dialog-confirm {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+}
+
+.confirm-dialog-confirm.is-danger {
+  background: #c75c5c;
+  border-color: #c75c5c;
+}
+
+.confirm-dialog-cancel:hover,
+.confirm-dialog-confirm:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.confirm-dialog-cancel:disabled,
+.confirm-dialog-confirm:disabled {
+  cursor: wait;
+  opacity: 0.58;
+  transform: none;
+}
+
+@media (max-width: 420px) {
+  .confirm-dialog-card {
+    padding: 27px 18px 22px;
+  }
+
+  .confirm-dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .confirm-dialog-actions button {
+    width: 100%;
+  }
+}

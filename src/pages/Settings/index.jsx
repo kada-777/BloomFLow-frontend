@@ -3,7 +3,7 @@ export default function Settings() {
   const sections = [
     ["Profile", "Your name, photo and work details"],
     ["Company", "BloomFlow organization details"],
-    ["Notifications", "Operational alerts and daily digests"],
+    // ["Notifications", "Operational alerts and daily digests"],
     ["Appearance", "Interface and display preferences"],
     ["Security", "Password and active sessions"],
     ["System", "Data retention and integrations"],

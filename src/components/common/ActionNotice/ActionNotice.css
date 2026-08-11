@@ -1,0 +1,43 @@
+.action-notice {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  font-size: 13px;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding: 12px 15px;
+}
+
+.action-notice-info {
+  background: var(--soft);
+  color: var(--text);
+}
+
+.action-notice-error {
+  background: #fff1f1;
+  border-color: #f3cccc;
+  color: #a84646;
+}
+
+.action-notice-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.action-notice button {
+  background: transparent;
+  border: 0;
+  color: currentColor;
+  padding: 2px;
+}
+
+.action-notice-action {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.action-notice-close {
+  display: grid;
+}

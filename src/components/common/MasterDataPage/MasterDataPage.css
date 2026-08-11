@@ -1,0 +1,79 @@
+.master-data-page {
+  background: var(--bg);
+  min-height: calc(100vh - 76px);
+  padding: 28px 32px;
+}
+
+.master-data-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.master-data-eyebrow {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  margin: 0 0 8px;
+}
+
+.master-data-header h1 {
+  color: var(--text);
+  font: 700 26px/1.2 "Plus Jakarta Sans";
+  margin: 0;
+}
+
+.master-data-header div > p:last-child {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 7px 0 0;
+}
+
+.master-data-add {
+  align-items: center;
+  background: var(--accent);
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.master-data-add:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+
+.master-data-table {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.master-data-table thead th,
+.master-data-table tbody td {
+  padding: 18px 22px;
+}
+
+@media (max-width: 760px) {
+  .master-data-page {
+    padding: 24px 16px;
+  }
+
+  .master-data-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .master-data-add {
+    width: fit-content;
+  }
+}

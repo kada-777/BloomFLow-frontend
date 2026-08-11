@@ -1,0 +1,14 @@
+.generic-data-table {
+  overflow: hidden;
+}
+
+.generic-table-state {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 56px 20px;
+  text-align: center;
+}
+
+.generic-data-table table {
+  margin: 0;
+}
