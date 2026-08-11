@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Eye } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
 import { PageHeader, SearchBar } from "../../components/ui";
 import DataTable from "../../components/common/DataTable";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
+import Pagination from "../../components/common/Pagination/Pagination";
 import BatchDetail from "./BatchDetail";
 import useBranchInventory from "../../hooks/useBranchInventory";
 import "./inventory.css";
@@ -12,6 +14,7 @@ function formatQuantity(value) {
 }
 
 export default function Inventory() {
+  const { role } = useOutletContext();
   const [q, setQ] = useState("");
   const [selectedFlowerId, setSelectedFlowerId] = useState(null);
   const inventory = useBranchInventory();
@@ -56,13 +59,26 @@ export default function Inventory() {
       />
       <ActionNotice message={inventory.error} tone="error" onAction={inventory.refresh} />
       <div className="toolbar">
-        <SearchBar value={q} onChange={setQ} />
+        <SearchBar
+          value={q}
+          onChange={setQ}
+          placeholder={role === "Branch Staff" ? "Search flowers" : undefined}
+        />
+        <label className="inventory-sort-field">
+          <span>Sort Flower</span>
+          <select value={inventory.sort} onChange={(event) => inventory.setSort(event.target.value)}>
+            <option value="default">Default</option>
+            <option value="flower_asc">Flower A-Z</option>
+            <option value="flower_desc">Flower Z-A</option>
+          </select>
+        </label>
       </div>
       <DataTable
         columns={columns}
         rows={rows}
         emptyMessage={inventory.loading ? "Loading branch inventory..." : "No branch inventory found."}
       />
+      <Pagination pagination={inventory.pagination} onPageChange={inventory.setPage} disabled={inventory.loading} />
       <BatchDetail
         flowerId={selectedFlowerId}
         open={selectedFlowerId !== null}

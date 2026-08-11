@@ -3,6 +3,7 @@ import ActionButtons from "../ActionButtons/ActionButtons";
 import ActionNotice from "../ActionNotice/ActionNotice";
 import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
 import GenericDataTable from "../GenericDataTable/GenericDataTable";
+import Pagination from "../Pagination/Pagination";
 import ResourceFormCard from "../ResourceFormCard/ResourceFormCard";
 import SearchBar from "../SearchBar/SearchBar";
 import useMasterDataResource from "../../../hooks/useMasterDataResource";
@@ -19,12 +20,18 @@ export default function MasterDataPage({
   columns,
   fields,
   formCopy,
+  sortOptions = [],
 }) {
-  const resourceState = useMasterDataResource({ resource, searchableFields });
+  const resourceState = useMasterDataResource({ resource, searchableFields, sortOptions });
   const {
     items,
     searchTerm,
     setSearchTerm,
+    pagination,
+    page,
+    setPage,
+    sort,
+    setSort,
     loading,
     error,
     refresh,
@@ -65,6 +72,17 @@ export default function MasterDataPage({
         ariaLabel={`Cari ${title}`}
       />
 
+      {sortOptions.length > 0 && (
+        <label className="master-data-sort-field">
+          <span>Sort by</span>
+          <select value={sort} onChange={(event) => setSort(event.target.value)}>
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </label>
+      )}
+
       <ActionNotice message={error} tone="error" onAction={refresh} />
       <ActionNotice message={notice} onClose={() => setNotice("")} />
 
@@ -78,6 +96,7 @@ export default function MasterDataPage({
           <ActionButtons onEdit={() => openEdit(item)} onDelete={() => openDelete(item)} />
         )}
       />
+      <Pagination pagination={pagination} onPageChange={setPage} disabled={loading} />
 
       <ResourceFormCard
         open={formOpen}

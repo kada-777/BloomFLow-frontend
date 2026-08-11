@@ -10,6 +10,11 @@ export default function FlowerCatalog() {
       searchPlaceholder="Cari nama atau varietas bunga..."
       emptyMessage="Belum ada bunga yang tersedia."
       searchableFields={["name", "variety"]}
+      sortOptions={[
+        { value: "default", label: "Default" },
+        { value: "name_asc", label: "Flower A-Z" },
+        { value: "name_desc", label: "Flower Z-A" },
+      ]}
       columns={[
         { key: "name", label: "NAMA BUNGA" },
         { key: "variety", label: "VARIETAS" },

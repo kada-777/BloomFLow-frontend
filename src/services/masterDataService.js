@@ -15,9 +15,16 @@ function unwrap(response) {
   return response.data?.data ?? response.data;
 }
 
+function unwrapPaginated(response) {
+  return {
+    data: Array.isArray(response.data?.data) ? response.data.data : [],
+    pagination: response.data?.pagination || null,
+  };
+}
+
 export const masterDataService = {
-  async list(resource) {
-    return unwrap(await api.get(getEndpoint(resource), { params: { limit: "100" } }));
+  async list(resource, { page = 1, limit = 10, sort = "default" } = {}) {
+    return unwrapPaginated(await api.get(getEndpoint(resource), { params: { page, limit, sort } }));
   },
 
   async create(resource, payload) {
