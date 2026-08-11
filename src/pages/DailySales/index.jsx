@@ -1,5 +1,6 @@
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
 import GenericDataTable from "../../components/common/GenericDataTable/GenericDataTable";
+import Pagination from "../../components/common/Pagination/Pagination";
 import DailySalesDetail from "../../components/daily-sales/DailySalesDetail";
 import DailySalesForm from "../../components/daily-sales/DailySalesForm";
 import useDailySales, { emptyDailySalesItem } from "../../hooks/useDailySales";
@@ -57,6 +58,15 @@ export default function DailySales() {
         <button className="button" type="button" onClick={dailySales.openCreate}>Add Sales</button>
       </header>
 
+      <label className="daily-sales-sort-field">
+        <span>Sort Date</span>
+        <select value={dailySales.sort} onChange={(event) => dailySales.setSort(event.target.value)}>
+          <option value="default">Default</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+        </select>
+      </label>
+
       <ActionNotice message={dailySales.error} tone="error" onAction={dailySales.refresh} />
       <ActionNotice message={dailySales.successMessage} onClose={() => dailySales.setSuccessMessage("")} />
 
@@ -68,6 +78,7 @@ export default function DailySales() {
         className="daily-sales-table-card table-card"
         rowKey={(row) => row.rowId}
       />
+      <Pagination pagination={dailySales.pagination} onPageChange={dailySales.setPage} disabled={dailySales.loading} />
 
       <DailySalesForm
         open={dailySales.formOpen}

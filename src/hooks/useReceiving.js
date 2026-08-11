@@ -84,6 +84,8 @@ export default function useReceiving() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFarm, setSelectedFarm] = useState("all");
   const [selectedDate, setSelectedDate] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [detail, setDetail] = useState(null);
@@ -99,24 +101,44 @@ export default function useReceiving() {
     setLoading(true);
     setError("");
     const results = await Promise.allSettled([
-      receivingService.list(),
+      receivingService.list({ page, limit: 10 }),
       receivingService.listFarms(),
       receivingService.listFlowers(),
     ]);
 
     const [receivingResult, farmResult, flowerResult] = results;
-    if (receivingResult.status === "fulfilled") setReceivings(normalizeList(receivingResult.value));
+    if (receivingResult.status === "fulfilled") {
+      setReceivings(normalizeList(receivingResult.value.data));
+      setPagination(receivingResult.value.pagination);
+    }
     else setError(getApiError(receivingResult.reason, "Data receiving gagal dimuat."));
     if (farmResult.status === "fulfilled") setFarms(normalizeList(farmResult.value));
     else setError((current) => current || getApiError(farmResult.reason, "Data farm gagal dimuat."));
     if (flowerResult.status === "fulfilled") setFlowers(normalizeList(flowerResult.value));
     else setError((current) => current || getApiError(flowerResult.reason, "Data flower gagal dimuat."));
     setLoading(false);
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  const updateSearchTerm = (value) => {
+    setSearchTerm(value);
+    setPage(1);
+  };
+  const updateSelectedFarm = (value) => {
+    setSelectedFarm(value);
+    setPage(1);
+  };
+  const updateSelectedDate = (value) => {
+    setSelectedDate(value);
+    setPage(1);
+  };
 
   const filteredReceivings = receivings.filter((receiving) => {
     const farmName = receiving.farm?.name || "";
@@ -188,11 +210,14 @@ export default function useReceiving() {
     farms,
     flowers,
     searchTerm,
-    setSearchTerm,
+    setSearchTerm: updateSearchTerm,
     selectedFarm,
-    setSelectedFarm,
+    setSelectedFarm: updateSelectedFarm,
     selectedDate,
-    setSelectedDate,
+    setSelectedDate: updateSelectedDate,
+    page,
+    setPage,
+    pagination,
     loading,
     error,
     refresh,

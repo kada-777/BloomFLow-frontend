@@ -39,6 +39,9 @@ function buildRows(entries) {
 
 export default function useBranchInventory() {
   const [inventory, setInventory] = useState([]);
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState("default");
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -46,22 +49,38 @@ export default function useBranchInventory() {
     setLoading(true);
     setError("");
     try {
-      setInventory(normalizeList(await inventoryService.getMyBranchStock()));
+      const result = await inventoryService.getMyBranchStock({ page, limit: 10, sort });
+      setInventory(normalizeList(result.data));
+      setPagination(result.pagination);
     } catch (requestError) {
       setError(getApiError(requestError, "Unable to load branch inventory."));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, sort]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  const updateSort = (value) => {
+    setSort(value);
+    setPage(1);
+  };
 
   return {
     rows: buildRows(inventory),
     loading,
     error,
     refresh,
+    page,
+    setPage,
+    sort,
+    setSort: updateSort,
+    pagination,
   };
 }

@@ -103,6 +103,9 @@ function summarizeSales(sales) {
 
 export default function useDailySales() {
   const [sales, setSales] = useState([]);
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState("default");
+  const [pagination, setPagination] = useState(null);
   const [flowers, setFlowers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -121,12 +124,13 @@ export default function useDailySales() {
     setError("");
     try {
       const [salesResult, flowersResult] = await Promise.allSettled([
-        dailySalesService.list(),
+        dailySalesService.list({ page, limit: 10, sort }),
         dailySalesService.listFlowers(),
       ]);
 
       if (salesResult.status === "fulfilled") {
-        setSales(normalizeList(salesResult.value));
+        setSales(normalizeList(salesResult.value.data));
+        setPagination(salesResult.value.pagination);
         if (flowersResult.status === "rejected") {
           setError(getDailySalesError(flowersResult.reason, "Data flower gagal dimuat."));
         }
@@ -138,11 +142,20 @@ export default function useDailySales() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, sort]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  const updateSort = (value) => {
+    setSort(value);
+    setPage(1);
+  };
 
   const openCreate = () => {
     setForm(emptyDailySalesForm());
@@ -209,6 +222,11 @@ export default function useDailySales() {
     loading,
     error,
     refresh,
+    page,
+    setPage,
+    sort,
+    setSort: updateSort,
+    pagination,
     form,
     setForm,
     openCreate,

@@ -8,9 +8,12 @@ function normalizeList(value) {
   return [];
 }
 
-export default function useMasterDataResource({ resource, searchableFields }) {
+export default function useMasterDataResource({ resource, searchableFields, sortOptions = [] }) {
   const [items, setItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState(sortOptions[0]?.value || "default");
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
@@ -25,17 +28,33 @@ export default function useMasterDataResource({ resource, searchableFields }) {
     setLoading(true);
     setError("");
     try {
-      setItems(normalizeList(await masterDataService.list(resource)));
+      const result = await masterDataService.list(resource, { page, limit: 10, sort });
+      setItems(normalizeList(result.data));
+      setPagination(result.pagination);
     } catch (requestError) {
       setError(getApiError(requestError, "Data gagal dimuat."));
     } finally {
       setLoading(false);
     }
-  }, [resource]);
+  }, [page, resource, sort]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  const updateSearchTerm = (value) => {
+    setSearchTerm(value);
+    setPage(1);
+  };
+
+  const updateSort = (value) => {
+    setSort(value);
+    setPage(1);
+  };
 
   const filteredItems = items.filter((item) => {
     const query = searchTerm.trim().toLowerCase();
@@ -92,7 +111,12 @@ export default function useMasterDataResource({ resource, searchableFields }) {
   return {
     items: filteredItems,
     searchTerm,
-    setSearchTerm,
+    setSearchTerm: updateSearchTerm,
+    page,
+    setPage,
+    pagination,
+    sort,
+    setSort: updateSort,
     loading,
     error,
     refresh,

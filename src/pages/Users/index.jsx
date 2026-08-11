@@ -6,6 +6,7 @@ import ActionButtons from "../../components/common/ActionButtons/ActionButtons";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
 import ConfirmDialog from "../../components/common/ConfirmDialog/ConfirmDialog";
 import GenericDataTable from "../../components/common/GenericDataTable/GenericDataTable";
+import Pagination from "../../components/common/Pagination/Pagination";
 import SearchBar from "../../components/common/SearchBar/SearchBar";
 import UserFormCard from "../../components/users/UserFormCard/UserFormCard";
 import "./user.css";
@@ -51,6 +52,8 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [branches, setBranches] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [formOpen, setFormOpen] = useState(false);
@@ -72,7 +75,8 @@ export default function UserManagement() {
     ]);
 
     if (usersResult.status === "fulfilled") {
-      setUsers(normalizeList(usersResult.value));
+      setUsers(normalizeList(usersResult.value.data));
+      setPagination(usersResult.value.pagination);
     } else {
       setPageError(getApiError(usersResult.reason, "Pengguna gagal dimuat."));
     }
@@ -87,11 +91,20 @@ export default function UserManagement() {
     }
 
     setLoading(false);
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  const updateSearchTerm = (value) => {
+    setSearchTerm(value);
+    setPage(1);
+  };
 
   const openCreateForm = () => {
     setEditingUser(null);
@@ -213,7 +226,7 @@ export default function UserManagement() {
 
       <SearchBar
         value={searchTerm}
-        onChange={setSearchTerm}
+        onChange={updateSearchTerm}
         placeholder="Cari email, role, cabang..."
         ariaLabel="Cari pengguna"
       />
@@ -237,6 +250,7 @@ export default function UserManagement() {
           />
         )}
       />
+      <Pagination pagination={pagination} onPageChange={setPage} disabled={loading} />
 
       <UserFormCard
         open={formOpen}

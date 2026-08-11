@@ -22,6 +22,23 @@
   margin-inline: auto;
 }
 
+.inventory-sort-field {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+}
+
+.inventory-sort-field select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  padding: 9px 12px;
+}
+
 .inventory-detail-modal {
   background: var(--card);
   border: 1px solid var(--border);

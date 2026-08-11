@@ -1,6 +1,7 @@
 import { Eye, Plus } from "lucide-react";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
 import GenericDataTable from "../../components/common/GenericDataTable/GenericDataTable";
+import Pagination from "../../components/common/Pagination/Pagination";
 import SearchBar from "../../components/common/SearchBar/SearchBar";
 import ReceivingFormCard from "../../components/receiving/ReceivingFormCard/ReceivingFormCard";
 import useReceiving from "../../hooks/useReceiving";
@@ -79,6 +80,7 @@ export default function Receiving() {
           </button>
         )}
       />
+      <Pagination pagination={receiving.pagination} onPageChange={receiving.setPage} disabled={receiving.loading} />
 
       <ReceivingFormCard
         open={receiving.formOpen}

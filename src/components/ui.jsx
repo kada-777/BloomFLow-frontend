@@ -60,14 +60,14 @@ export function ThemeToggle() {
     </button>
   );
 }
-export function SearchBar({ value, onChange }) {
+export function SearchBar({ value, onChange, placeholder = "Search flowers, branches..." }) {
   return (
     <label className="search">
       <Search size={17} />
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search flowers, branches..."
+        placeholder={placeholder}
       />
     </label>
   );

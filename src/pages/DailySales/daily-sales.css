@@ -88,6 +88,8 @@
 .daily-sales-detail-date span { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .1em; }
 .daily-sales-detail-date strong { color: var(--text); font-size: 15px; }
 .daily-sales-detail-table-wrap { overflow-x: auto; }
+.daily-sales-sort-field { align-items: center; color: var(--muted); display: flex; font-size: 12px; gap: 8px; margin-bottom: 16px; }
+.daily-sales-sort-field select { background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 13px; padding: 9px 12px; }
 .daily-sales-detail-table { border-collapse: collapse; min-width: 500px; width: 100%; }
 .daily-sales-detail-table th, .daily-sales-detail-table td { border-bottom: 1px solid var(--border); padding: 13px 10px; text-align: left; }
 .daily-sales-detail-table th { color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
