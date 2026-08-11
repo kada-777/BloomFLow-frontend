@@ -39,22 +39,14 @@ const menus = {
         ["Flower Catalog", Flower2, "/flower-catalog"],
       ],
     ],
-    [
-      "SUPPLY CHAIN",
-      [
-        ["Inventory", Package, "/inventory"],
-        ["Distribution", Truck, "/distribution"],
-        ["Forecasting", Sparkles, "/forecasting"],
-        ["Quality Control", ShieldCheck, "/quality-control"],
-      ],
-    ],
+    ["SUPPLY CHAIN", [["Distribution", Truck, "/distribution"]]],
   ],
   "Head Office": [
     [
       "PLANNING",
       [
         ["Dashboard", LayoutDashboard, "/"],
-        ["Forecasting", Sparkles, "/forecasting"],
+
         ["Analytics", ChartNoAxesCombined, "/analytics"],
       ],
     ],
@@ -62,6 +54,7 @@ const menus = {
       "FULFILMENT",
       [
         ["Receiving", Package, "/receiving"],
+        ["Distribution Planning", Sparkles, "/distribution-planning"],
         ["Distribution", Truck, "/distribution"],
       ],
     ],
@@ -76,7 +69,6 @@ const menus = {
         ["Daily Sales", ReceiptText, "/daily-sales"],
       ],
     ],
-    ["FRESHNESS", [["Quality Control", ShieldCheck, "/quality-control"]]],
   ],
 };
 

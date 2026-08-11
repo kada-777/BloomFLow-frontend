@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import BatchDetail from "./pages/Inventory/BatchDetail";
 import Distribution from "./pages/Distribution";
-import Forecasting from "./pages/Forecasting";
+import DistributionPlanning from "./pages/DistributionPlanning";
 import Analytics from "./pages/Analytics";
 import QualityControl from "./pages/QualityControl";
 import Branches from "./pages/Branches";
@@ -32,7 +32,8 @@ export default function App() {
         <Route path="/inventory/:flowerId" element={<BatchDetail />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/distribution" element={<Distribution />} />
-        <Route path="/forecasting" element={<Forecasting />} />
+        <Route path="/distribution-planning" element={<DistributionPlanning />} />
+        <Route path="/forecasting" element={<Navigate to="/distribution-planning" replace />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/quality-control" element={<QualityControl />} />
         <Route path="/branches" element={<Branches />} />

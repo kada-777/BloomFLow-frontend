@@ -1,0 +1,42 @@
+.distribution-planning-page { background: var(--bg); min-height: calc(100vh - 76px); padding: 28px 32px; }
+.distribution-planning-header, .distribution-section-heading, .distribution-plan-actions { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; }
+.distribution-planning-header { margin-bottom: 22px; }
+.distribution-planning-eyebrow { color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .13em; margin: 0 0 8px; }
+.distribution-planning-header h1, .distribution-section-heading h2 { color: var(--text); font-family: "Plus Jakarta Sans"; margin: 0; }
+.distribution-planning-header h1 { font-size: 26px; }
+.distribution-planning-header > div > p:last-child, .distribution-section-heading p { color: var(--muted); margin: 7px 0 0; }
+.distribution-primary-button, .distribution-secondary-button, .distribution-danger-button { align-items: center; border-radius: 11px; display: inline-flex; font-size: 14px; font-weight: 700; gap: 8px; min-height: 42px; padding: 0 16px; }
+.distribution-primary-button { background: var(--accent); border: 0; color: #fff; }
+.distribution-secondary-button { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.distribution-danger-button { background: #d9585818; border: 1px solid #d9585860; color: #ad3434; }
+.distribution-primary-button:disabled, .distribution-secondary-button:disabled, .distribution-danger-button:disabled { cursor: not-allowed; opacity: .6; }
+.distribution-generate-area { align-items: flex-end; display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
+.distribution-generate-area p { color: var(--muted); font-size: 12px; line-height: 1.45; margin: 0; text-align: right; }
+.distribution-plan-detail { background: var(--card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); margin-top: 18px; padding: 20px; }
+.distribution-section-heading h2 { font-size: 18px; }
+.distribution-section-heading p { font-size: 13px; }
+.distribution-status { border-radius: 999px; display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .04em; padding: 6px 10px; white-space: nowrap; }
+.status-draft { background: #f5b94228; color: #9b6600; }.status-finalized { background: #5a87e928; color: #2756b5; }.status-order_created { background: #a65be228; color: #7430a9; }.status-in_transit { background: #2c9d7228; color: #16734f; }.status-received { background: #2c9d7228; color: #16734f; }.status-cancelled { background: #d9585828; color: #ad3434; }
+.distribution-plan-meta { color: var(--muted); display: flex; flex-wrap: wrap; font-size: 13px; gap: 8px 18px; margin: 20px 0 14px; }
+.distribution-table-wrap { overflow-x: auto; }
+.distribution-branch-groups { display: grid; gap: 16px; margin-top: 18px; }
+.distribution-branch-group { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.distribution-branch-heading { align-items: center; display: flex; gap: 12px; justify-content: space-between; margin-bottom: 10px; }
+.distribution-branch-heading h3 { color: var(--text); font-size: 15px; margin: 0; }
+.distribution-branch-heading span { color: var(--muted); display: block; font-size: 12px; font-weight: 800; margin-top: 4px; }
+.distribution-add-flower-button { align-items: center; background: transparent; border: 1px dashed var(--accent); border-radius: 10px; color: var(--accent); display: inline-flex; font-size: 12px; font-weight: 800; gap: 7px; min-height: 34px; padding: 0 12px; white-space: nowrap; }
+.distribution-add-flower-button:disabled { border-color: var(--border); color: var(--muted); cursor: not-allowed; opacity: .75; }
+.distribution-add-flower-panel { align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 11px; display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 12px; padding: 12px; }
+.distribution-add-flower-panel label { color: var(--muted); font-size: 12px; font-weight: 800; }
+.distribution-add-flower-panel select { background: var(--bg); border: 1px solid var(--border); border-radius: 9px; color: var(--text); min-height: 36px; min-width: 240px; padding: 0 10px; }
+.distribution-add-flower-panel select:focus { border-color: var(--accent); outline: none; }
+.distribution-plan-table { border-collapse: collapse; min-width: 720px; width: 100%; }
+.distribution-plan-table th { color: var(--muted); font-size: 11px; letter-spacing: .05em; padding: 11px 10px; text-align: left; }
+.distribution-plan-table td { border-top: 1px solid var(--border); color: var(--text); font-size: 13px; padding: 11px 10px; }
+.distribution-plan-table .distribution-empty-row { color: var(--muted); text-align: center; }
+.distribution-plan-table input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); min-height: 36px; padding: 0 9px; width: 100%; }
+.distribution-plan-table input:disabled { cursor: default; opacity: .65; }
+.distribution-plan-table input:focus { border-color: var(--accent); outline: none; }
+.distribution-plan-actions { align-items: center; justify-content: flex-end; margin-top: 18px; }
+.distribution-state { color: var(--muted); padding: 28px 0 8px; text-align: center; }
+@media (max-width: 720px) { .distribution-planning-page { padding: 22px 16px; }.distribution-planning-header { align-items: stretch; flex-direction: column; }.distribution-primary-button { justify-content: center; }.distribution-generate-area { align-items: stretch; max-width: none; }.distribution-generate-area p { text-align: left; }.distribution-section-heading { flex-direction: column; }.distribution-plan-actions { align-items: stretch; flex-direction: column; }.distribution-plan-actions button { justify-content: center; } }
