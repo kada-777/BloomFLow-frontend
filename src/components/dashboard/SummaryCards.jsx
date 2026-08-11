@@ -3,7 +3,7 @@ import SummaryCard from "./SummaryCard";
 
 const formatNumber = (value) => (value === null ? null : value.toLocaleString("en-US"));
 
-export default function SummaryCards({ summary, resourceErrors, onRetry }) {
+export default function SummaryCards({ summary, resourceErrors, onRetry, isBranchStaff }) {
   const cards = [
     { label: "Total Branches", value: formatNumber(summary.totalBranches), icon: Building2, error: resourceErrors.branches },
     { label: "Total Farms", value: formatNumber(summary.totalFarms), icon: Sprout, error: resourceErrors.farms },
@@ -14,10 +14,13 @@ export default function SummaryCards({ summary, resourceErrors, onRetry }) {
     // Backend has no distribution/in-transit endpoint yet; this is intentionally not a fake value.
     { label: "Flowers In Transit", value: null, icon: Flower2, unsupported: true },
   ];
+  const visibleCards = isBranchStaff
+    ? cards.filter((card) => ["Total Branch Stock", "Flowers In Transit"].includes(card.label))
+    : cards;
 
   return (
-    <section className="dashboard-summary-grid" aria-label="Dashboard summary">
-      {cards.map((card) => (
+    <section className={`dashboard-summary-grid${isBranchStaff ? " branch-staff" : ""}`} aria-label="Dashboard summary">
+      {visibleCards.map((card) => (
         <SummaryCard key={card.label} {...card} onRetry={onRetry} />
       ))}
     </section>

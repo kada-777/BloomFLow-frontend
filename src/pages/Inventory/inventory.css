@@ -19,6 +19,36 @@
 
 .inventory-detail-page {
   max-width: 1100px;
+  margin-inline: auto;
+}
+
+.inventory-detail-modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 24px;
+  width: 100%;
+}
+
+.inventory-detail-modal-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.inventory-detail-modal-header h2 {
+  font: 700 20px "Plus Jakarta Sans";
+  margin: 0 0 6px;
+}
+
+.inventory-detail-modal-header span {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .inventory-back-link {
@@ -38,6 +68,11 @@
 
 .inventory-detail-table-wrap {
   margin-top: 8px;
+}
+
+.inventory-detail-table-wrap th,
+.inventory-detail-table-wrap td {
+  text-align: center;
 }
 
 .inventory-source-list {
@@ -66,4 +101,10 @@
 .inventory-status-damaged {
   background: #f9e6e6;
   color: #a84646;
+}
+
+@media (max-width: 600px) {
+  .inventory-detail-modal {
+    padding: 18px;
+  }
 }

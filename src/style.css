@@ -758,6 +758,10 @@ form input {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
+.dashboard-summary-grid.branch-staff {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .dashboard-summary-card,
 .dashboard-card {
   background: var(--card);
@@ -972,6 +976,7 @@ form input {
   .dashboard-skeleton-summary {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
 }
 
 @media (max-width: 760px) {
@@ -982,6 +987,10 @@ form input {
   .dashboard-summary-grid,
   .dashboard-skeleton-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-summary-grid.branch-staff {
+    grid-template-columns: 1fr;
   }
 
   .dashboard-chart-grid,

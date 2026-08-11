@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Eye } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { PageHeader, SearchBar } from "../../components/ui";
 import DataTable from "../../components/common/DataTable";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
+import BatchDetail from "./BatchDetail";
 import useBranchInventory from "../../hooks/useBranchInventory";
 import "./inventory.css";
 
@@ -13,7 +13,7 @@ function formatQuantity(value) {
 
 export default function Inventory() {
   const [q, setQ] = useState("");
-  const navigate = useNavigate();
+  const [selectedFlowerId, setSelectedFlowerId] = useState(null);
   const inventory = useBranchInventory();
   const query = q.trim().toLowerCase();
   const rows = inventory.rows.filter((row) => {
@@ -40,7 +40,7 @@ export default function Inventory() {
         <button
           className="inventory-detail-button"
           type="button"
-          onClick={() => navigate(`/inventory/${row.flowerId}`)}
+          onClick={() => setSelectedFlowerId(row.flowerId)}
         >
           <Eye size={15} /> View Detail
         </button>
@@ -62,6 +62,11 @@ export default function Inventory() {
         columns={columns}
         rows={rows}
         emptyMessage={inventory.loading ? "Loading branch inventory..." : "No branch inventory found."}
+      />
+      <BatchDetail
+        flowerId={selectedFlowerId}
+        open={selectedFlowerId !== null}
+        onClose={() => setSelectedFlowerId(null)}
       />
     </>
   );

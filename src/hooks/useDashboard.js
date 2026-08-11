@@ -167,7 +167,9 @@ export function useDashboard() {
           : resources.headOfficeInventory.reduce((total, entry) => total + toNumber(entry.totalAvailable), 0),
         totalBranchStock: resourceErrors.branchInventory
           ? null
-          : selectedRows.reduce((total, row) => total + toNumber(row.quantity), 0),
+          : selectedRows
+            .filter((row) => row.flowerStatus === "FRESH" || row.flowerStatus === "GRADE_C")
+            .reduce((total, row) => total + toNumber(row.quantity), 0),
         forecastHarvested: null,
         flowersInTransit: null,
       },
