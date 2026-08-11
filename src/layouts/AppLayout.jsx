@@ -14,7 +14,8 @@ import {
   Users,
   Settings,
   ChevronLeft,
-  ChevronRight, Warehouse,
+  ChevronRight,
+  Warehouse,
   ReceiptText,
 } from "lucide-react";
 import logo from "../assets/Logo.png";
@@ -47,14 +48,6 @@ const menus = {
         ["Quality Control", ShieldCheck, "/quality-control"],
       ],
     ],
-    
-    [
-      "ADMINISTRATION",
-      [
-        
-        ["Settings", Settings, "/settings"],
-      ],
-    ],
   ],
   "Head Office": [
     [
@@ -83,12 +76,7 @@ const menus = {
         ["Daily Sales", ReceiptText, "/daily-sales"],
       ],
     ],
-    [
-      "FRESHNESS",
-      [
-        ["Quality Control", ShieldCheck, "/quality-control"],
-      ],
-    ],
+    ["FRESHNESS", [["Quality Control", ShieldCheck, "/quality-control"]]],
   ],
 };
 
@@ -120,13 +108,11 @@ export default function AppLayout() {
 
   return (
     <div className={`shell ${isCollapsed ? "sidebar-collapsed" : ""}`}>
-      <aside className={`${isCollapsed ? "collapsed" : ""} ${open ? "open" : ""}`}>
+      <aside
+        className={`${isCollapsed ? "collapsed" : ""} ${open ? "open" : ""}`}
+      >
         <div className="brand">
-          <img
-            className="brand-logo"
-            src={logo}
-            alt="BloomFlow Logo"
-          />
+          <img className="brand-logo" src={logo} alt="BloomFlow Logo" />
           <span>BloomFlow</span>
           <button
             className="sidebar-mobile-close"
