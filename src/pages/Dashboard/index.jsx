@@ -2,10 +2,8 @@ import { useOutletContext } from "react-router-dom";
 import BranchSelector from "../../components/dashboard/BranchSelector";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import DashboardSkeleton from "../../components/dashboard/DashboardSkeleton";
-import DistributionStatusChart from "../../components/dashboard/DistributionStatusChart";
 import FlowerStatusPieChart from "../../components/dashboard/FlowerStatusPieChart";
 import RecentActivityTable from "../../components/dashboard/RecentActivityTable";
-import RevenueChart from "../../components/dashboard/RevenueChart";
 import SummaryCards from "../../components/dashboard/SummaryCards";
 import TopFlowerSalesChart from "../../components/dashboard/TopFlowerSalesChart";
 import { useDashboard } from "../../hooks/useDashboard";
@@ -71,8 +69,6 @@ export default function Dashboard() {
               onRetry={refresh}
             />
             <TopFlowerSalesChart loading={loading} />
-            <RevenueChart loading={loading} />
-            <DistributionStatusChart loading={loading} />
           </div>
           <RecentActivityTable
             activities={data.activities}

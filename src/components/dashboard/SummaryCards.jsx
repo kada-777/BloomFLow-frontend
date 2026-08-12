@@ -16,7 +16,7 @@ export default function SummaryCards({ summary, resourceErrors, onRetry, isBranc
   ];
   const visibleCards = isBranchStaff
     ? cards.filter((card) => ["Total Branch Stock", "Flowers In Transit"].includes(card.label))
-    : cards;
+    : cards.filter((card) => card.label !== "Flowers In Transit");
 
   return (
     <section className={`dashboard-summary-grid${isBranchStaff ? " branch-staff" : ""}`} aria-label="Dashboard summary">

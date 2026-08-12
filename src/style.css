@@ -755,7 +755,8 @@ form input {
 .dashboard-summary-grid {
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  justify-content: center;
 }
 
 .dashboard-summary-grid.branch-staff {
@@ -970,11 +971,11 @@ form input {
 
 @media (max-width: 1200px) {
   .dashboard-summary-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 
   .dashboard-skeleton-summary {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 
 }
@@ -986,7 +987,7 @@ form input {
 
   .dashboard-summary-grid,
   .dashboard-skeleton-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 
   .dashboard-summary-grid.branch-staff {
