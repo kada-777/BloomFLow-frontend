@@ -30,6 +30,7 @@ export default function Dashboard() {
     refresh,
     isBranchStaff,
     isHeadOffice,
+    canSelectBranch,
     rangeDays,
     setRangeDays,
     period,
@@ -40,7 +41,19 @@ export default function Dashboard() {
   return (
     <div className="dashboard-page">
       <DashboardHeader title={title} subtitle={subtitle} showAction={!isHeadOffice} />
-      {isHeadOffice && <DashboardRangeFilter value={rangeDays} onChange={setRangeDays} disabled={loading} />}
+      {canSelectBranch && (
+        <div className="dashboard-filter-row dashboard-period-filter-row">
+          <DashboardRangeFilter value={rangeDays} onChange={setRangeDays} disabled={loading} />
+          <BranchSelector
+            branches={data.branches}
+            selectedBranch={selectedBranch}
+            onChange={setSelectedBranch}
+            disabled={loading}
+            loading={loading}
+            error={resourceErrors.branches}
+          />
+        </div>
+      )}
       {isHeadOffice && period && (
         <div className="dashboard-export-actions">
           <button className="button" type="button" onClick={() => openDashboardReport({ days: rangeDays, branch: selectedBranch })}>Print / Save as PDF</button>
@@ -65,18 +78,6 @@ export default function Dashboard() {
             isHeadOffice={isHeadOffice}
             isHeadOffice={isHeadOffice}
           />
-          {!isBranchStaff && (
-            <div className="dashboard-filter-row">
-              <BranchSelector
-                branches={data.branches}
-                selectedBranch={selectedBranch}
-                onChange={setSelectedBranch}
-                disabled={isBranchStaff}
-                loading={loading}
-                error={resourceErrors.branches}
-              />
-            </div>
-          )}
           <div className="dashboard-chart-grid">
             <FlowerStatusPieChart
               data={data.flowerStatus}

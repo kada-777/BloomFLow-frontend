@@ -68,6 +68,7 @@ export default function Distribution() {
   const [pagination, setPagination] = useState(null);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("newest");
+  const [status, setStatus] = useState("all");
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -83,7 +84,8 @@ export default function Distribution() {
       const payload = await distributionService.listOrders({
         page,
         limit: ORDER_LIMIT,
-        sort,
+        ...(!canShip ? { sort } : {}),
+        ...(canShip ? { status } : {}),
       });
       setOrders(payload?.data || []);
       setPagination(payload?.pagination || null);
@@ -92,7 +94,7 @@ export default function Distribution() {
     } finally {
       setLoading(false);
     }
-  }, [page, sort]);
+  }, [canShip, page, sort, status]);
 
   useEffect(() => {
     loadOrders();
@@ -111,6 +113,11 @@ export default function Distribution() {
 
   const changeSort = (value) => {
     setSort(value);
+    setPage(1);
+  };
+
+  const changeStatus = (value) => {
+    setStatus(value);
     setPage(1);
   };
 
@@ -176,14 +183,29 @@ export default function Distribution() {
           <h1>Riwayat Distribution</h1>
           <p>Lihat status pengiriman, detail cabang, dan kirim semua order dalam satu plan.</p>
         </div>
-        <label className="distribution-sort-control">
-          <span>Sort</span>
-          <select value={sort} onChange={(event) => changeSort(event.target.value)}>
-            <option value="newest">Newest</option>
-            <option value="branch">Cabang A-Z</option>
-            <option value="status">Status</option>
-          </select>
-        </label>
+        <div className="distribution-header-controls">
+          {!canShip && (
+            <label className="distribution-sort-control">
+              <span>Sort</span>
+              <select value={sort} onChange={(event) => changeSort(event.target.value)}>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+              </select>
+            </label>
+          )}
+          {canShip && (
+            <label className="distribution-sort-control">
+              <span>Status</span>
+              <select value={status} onChange={(event) => changeStatus(event.target.value)}>
+                <option value="all">Semua Status</option>
+                <option value="draft">Draft</option>
+                <option value="in_transit">In Transit</option>
+                <option value="received">Received</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </label>
+          )}
+        </div>
       </header>
 
       <ActionNotice message={error} tone="error" onAction={loadOrders} />

@@ -820,15 +820,22 @@ form input {
 .dashboard-filter-row {
   align-items: end;
   display: flex;
-  justify-content: flex-end;
+  gap: 12px;
+  justify-content: flex-start;
+}
+
+.dashboard-period-filter-row {
+  align-items: end;
 }
 
 .dashboard-branch-selector {
+  align-items: center;
   color: var(--muted);
-  display: grid;
+  display: inline-flex;
   font-size: 11px;
   font-weight: 600;
   gap: 6px;
+  margin-bottom: 14px;
 }
 
 .dashboard-branch-selector > div {
@@ -1037,9 +1044,11 @@ form input {
   }
 
   .dashboard-filter-row {
+    flex-wrap: wrap;
     justify-content: stretch;
   }
 
+  .dashboard-range-filter,
   .dashboard-branch-selector,
   .dashboard-branch-selector select {
     width: 100%;
