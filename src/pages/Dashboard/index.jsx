@@ -7,6 +7,8 @@ import RecentActivityTable from "../../components/dashboard/RecentActivityTable"
 import SummaryCards from "../../components/dashboard/SummaryCards";
 import TopFlowerSalesChart from "../../components/dashboard/TopFlowerSalesChart";
 import { useDashboard } from "../../hooks/useDashboard";
+import DashboardRangeFilter from "../../components/dashboard/DashboardRangeFilter";
+import { exportDashboardCsv, openDashboardReport } from "../../services/dashboardExport";
 
 const roleCopy = {
   "Super Admin": ["Supply chain overview", "Live intelligence across your branch network"],
@@ -27,12 +29,24 @@ export default function Dashboard() {
     setSelectedBranch,
     refresh,
     isBranchStaff,
+    isHeadOffice,
+    rangeDays,
+    setRangeDays,
+    period,
+    setActivityPage,
   } = useDashboard();
   const title = "Welcome to BloomFlow🌷";
 
   return (
     <div className="dashboard-page">
-      <DashboardHeader title={title} subtitle={subtitle} />
+      <DashboardHeader title={title} subtitle={subtitle} showAction={!isHeadOffice} />
+      {isHeadOffice && <DashboardRangeFilter value={rangeDays} onChange={setRangeDays} disabled={loading} />}
+      {isHeadOffice && period && (
+        <div className="dashboard-export-actions">
+          <button className="button" type="button" onClick={() => openDashboardReport({ days: rangeDays, branch: selectedBranch })}>Print / Save as PDF</button>
+          <button className="button" type="button" onClick={() => exportDashboardCsv({ period, summary: data.summary, activities: data.activities, branchName: data.selectedBranchName })}>Download CSV</button>
+        </div>
+      )}
       {error && (
         <div className="dashboard-alert" role="alert">
           <span>{error}</span>
@@ -48,6 +62,8 @@ export default function Dashboard() {
             resourceErrors={resourceErrors}
             onRetry={refresh}
             isBranchStaff={isBranchStaff}
+            isHeadOffice={isHeadOffice}
+            isHeadOffice={isHeadOffice}
           />
           {!isBranchStaff && (
             <div className="dashboard-filter-row">
@@ -68,13 +84,17 @@ export default function Dashboard() {
               error={resourceErrors.branchInventory}
               onRetry={refresh}
             />
-            <TopFlowerSalesChart loading={loading} />
+            <TopFlowerSalesChart data={data.topFlowerSales} loading={loading} />
           </div>
           <RecentActivityTable
             activities={data.activities}
             loading={loading}
             error={resourceErrors.dailySales || resourceErrors.receivings}
             onRetry={refresh}
+            pagination={data.activitiesPagination}
+            onPageChange={setActivityPage}
+            paginationDisabled={loading}
+            isHeadOffice={isHeadOffice}
           />
         </>
       )}

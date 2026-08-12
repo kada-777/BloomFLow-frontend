@@ -97,18 +97,34 @@ export function useDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [rangeDays, setRangeDays] = useState(7);
+  const [activityPage, setActivityPage] = useState(1);
+  const [headOfficeData, setHeadOfficeData] = useState(null);
 
   const refresh = useCallback(() => setRefreshKey((value) => value + 1), []);
 
+  const updateRangeDays = (value) => {
+    setRangeDays(value);
+    setActivityPage(1);
+  };
+
+  const updateSelectedBranch = (value) => {
+    setSelectedBranch(value);
+    setActivityPage(1);
+  };
+
   useEffect(() => {
     let isCurrent = true;
-    const requests = {
-      dailySales: dashboardService.getDailySales,
-    };
+    const requests = {};
 
-    if (role === "STAFF_BRANCH") {
+    if (role === "STAFF_HEAD_OFFICE") {
+      requests.headOfficeDashboard = () => dashboardService.getHeadOfficeDashboard(rangeDays, activityPage, 10, selectedBranch);
+      requests.branches = dashboardService.getBranches;
+    } else if (role === "STAFF_BRANCH") {
+      requests.dailySales = dashboardService.getDailySales;
       requests.branchInventory = dashboardService.getMyBranchInventory;
     } else {
+      requests.dailySales = dashboardService.getDailySales;
       requests.branches = dashboardService.getBranches;
       requests.farms = dashboardService.getFarms;
       requests.headOfficeInventory = dashboardService.getHeadOfficeInventory;
@@ -129,7 +145,8 @@ export function useDashboard() {
       results.forEach((result) => {
         if (result.status === "fulfilled") {
           const [key, value] = result.value;
-          nextResources[key] = toArray(value);
+           if (key === "headOfficeDashboard") setHeadOfficeData(value);
+           else nextResources[key] = toArray(value);
         } else {
           const resourceKey = Object.keys(requests)[results.indexOf(result)];
           nextErrors[resourceKey] = normalizeError(result.reason);
@@ -144,7 +161,7 @@ export function useDashboard() {
     return () => {
       isCurrent = false;
     };
-  }, [refreshKey, role]);
+  }, [activityPage, rangeDays, refreshKey, role, selectedBranch]);
 
   const branches = resources.branches;
   const branchRows = normalizeBranchRows(resources, role, user?.branchId);
@@ -157,7 +174,17 @@ export function useDashboard() {
   }, [role, selectedBranchExists]);
 
   return {
-    data: {
+    data: role === "STAFF_HEAD_OFFICE" && headOfficeData ? {
+      branches,
+      summary: headOfficeData.summary,
+      flowerStatus: headOfficeData.flowerStatus,
+      topFlowerSales: headOfficeData.topFlowerSales,
+      activities: headOfficeData.activities,
+      activitiesPagination: headOfficeData.activitiesPagination,
+      selectedBranchName: selectedBranch === "all"
+        ? "All Branches"
+        : branches.find((branch) => String(branch.id) === String(selectedBranch))?.name || "Selected Branch",
+    } : {
       branches,
       summary: {
         totalBranches: resourceErrors.branches ? null : resources.branches.length,
@@ -174,14 +201,21 @@ export function useDashboard() {
         flowersInTransit: null,
       },
       flowerStatus: buildFlowerStatus(selectedRows),
+      topFlowerSales: [],
       activities: normalizeActivities(resources),
     },
     loading,
     error: Object.keys(resourceErrors).length ? "Some dashboard data could not be loaded." : null,
     resourceErrors,
     selectedBranch,
-    setSelectedBranch,
+    setSelectedBranch: updateSelectedBranch,
     refresh,
     isBranchStaff: role === "STAFF_BRANCH",
+    isHeadOffice: role === "STAFF_HEAD_OFFICE",
+    rangeDays,
+    setRangeDays: updateRangeDays,
+    period: headOfficeData?.period || null,
+    activityPage,
+    setActivityPage,
   };
 }

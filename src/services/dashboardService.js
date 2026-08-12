@@ -5,6 +5,11 @@ function unwrap(response) {
 }
 
 export const dashboardService = {
+  async getHeadOfficeDashboard(days = 7, activityPage = 1, activityLimit = 10, branchId = "all") {
+    return unwrap(await api.get("/dashboard/head-office", {
+      params: { days, activityPage, activityLimit, branchId },
+    }));
+  },
   async getBranches() {
     return unwrap(await api.get("/branches", { params: { limit: "100" } }));
   },

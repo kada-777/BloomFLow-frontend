@@ -1,14 +1,15 @@
 import DashboardCard from "./DashboardCard";
 import DashboardState from "./DashboardState";
+import Pagination from "../common/Pagination/Pagination";
 
 function formatDate(value) {
   if (!value) return "-";
   return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(value));
 }
 
-export default function RecentActivityTable({ activities, loading, error, onRetry }) {
+export default function RecentActivityTable({ activities, loading, error, onRetry, pagination, onPageChange, paginationDisabled, isHeadOffice }) {
   return (
-    <DashboardCard title="Recent Activities" subtitle="Latest receiving and daily sales activity" className="dashboard-activity-card">
+    <DashboardCard title="Recent Activities" subtitle={isHeadOffice ? "Latest branch and farm activity" : "Latest receiving and daily sales activity"} className="dashboard-activity-card">
       {loading ? (
         <DashboardState type="loading" message="Loading recent activities..." />
       ) : error ? (
@@ -16,8 +17,9 @@ export default function RecentActivityTable({ activities, loading, error, onRetr
       ) : activities.length === 0 ? (
         <DashboardState type="empty" message="No recent activities available." />
       ) : (
-        <div className="dashboard-table-wrap">
-          <table>
+        <>
+          <div className="dashboard-table-wrap">
+            <table>
             <thead>
               <tr><th>Activity</th><th>Details</th><th>Date</th></tr>
             </thead>
@@ -30,8 +32,10 @@ export default function RecentActivityTable({ activities, loading, error, onRetr
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+            </table>
+          </div>
+          <Pagination pagination={pagination} onPageChange={onPageChange} disabled={paginationDisabled} />
+        </>
       )}
     </DashboardCard>
   );
