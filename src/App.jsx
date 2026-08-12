@@ -7,7 +7,6 @@ import Inventory from "./pages/Inventory";
 import BatchDetail from "./pages/Inventory/BatchDetail";
 import Distribution from "./pages/Distribution";
 import DistributionPlanning from "./pages/DistributionPlanning";
-import Analytics from "./pages/Analytics";
 import QualityControl from "./pages/QualityControl";
 import Branches from "./pages/Branches";
 import Farms from "./pages/Farms";
@@ -36,7 +35,7 @@ export default function App() {
         <Route path="/distribution" element={<Distribution />} />
         <Route path="/distribution-planning" element={<DistributionPlanning />} />
         <Route path="/forecasting" element={<Navigate to="/distribution-planning" replace />} />
-        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/analytics" element={<Navigate to="/" replace />} />
         <Route path="/quality-control" element={<QualityControl />} />
         <Route path="/branches" element={<Branches />} />
         <Route path="/farms" element={<Farms />} />

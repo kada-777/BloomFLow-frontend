@@ -33,8 +33,8 @@ export const distributionService = {
     return unwrap(await api.post(`/distribution-plans/${id}/create-orders`));
   },
 
-  async listOrders({ page = 1, limit = 10, sort = "newest" } = {}) {
-    const response = await api.get("/distributions", { params: { page, limit, sort } });
+  async listOrders({ page = 1, limit = 10, sort = "newest", status = "all" } = {}) {
+    const response = await api.get("/distributions", { params: { page, limit, sort, status } });
     return response.data;
   },
 

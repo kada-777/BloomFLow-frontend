@@ -6,7 +6,6 @@ import {
   Package,
   Truck,
   Sparkles,
-  ChartNoAxesCombined,
   ShieldCheck,
   MapPin,
   Sprout,
@@ -27,7 +26,6 @@ const menus = {
       "OVERVIEW",
       [
         ["Dashboard", LayoutDashboard, "/"],
-        ["Analytics", ChartNoAxesCombined, "/analytics"],
       ],
     ],
     [
@@ -47,7 +45,6 @@ const menus = {
       [
         ["Dashboard", LayoutDashboard, "/"],
 
-        ["Analytics", ChartNoAxesCombined, "/analytics"],
       ],
     ],
     [

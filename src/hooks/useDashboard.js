@@ -117,12 +117,11 @@ export function useDashboard() {
     let isCurrent = true;
     const requests = {};
 
-    if (role === "STAFF_HEAD_OFFICE") {
+    if (role === "STAFF_HEAD_OFFICE" || role === "SUPERADMIN") {
       requests.headOfficeDashboard = () => dashboardService.getHeadOfficeDashboard(rangeDays, activityPage, 10, selectedBranch);
       requests.branches = dashboardService.getBranches;
     } else if (role === "STAFF_BRANCH") {
-      requests.dailySales = dashboardService.getDailySales;
-      requests.branchInventory = dashboardService.getMyBranchInventory;
+      requests.headOfficeDashboard = () => dashboardService.getHeadOfficeDashboard(rangeDays, activityPage, 10, selectedBranch);
     } else {
       requests.dailySales = dashboardService.getDailySales;
       requests.branches = dashboardService.getBranches;
@@ -174,7 +173,7 @@ export function useDashboard() {
   }, [role, selectedBranchExists]);
 
   return {
-    data: role === "STAFF_HEAD_OFFICE" && headOfficeData ? {
+    data: headOfficeData ? {
       branches,
       summary: headOfficeData.summary,
       flowerStatus: headOfficeData.flowerStatus,
@@ -212,6 +211,7 @@ export function useDashboard() {
     refresh,
     isBranchStaff: role === "STAFF_BRANCH",
     isHeadOffice: role === "STAFF_HEAD_OFFICE",
+    canSelectBranch: role === "STAFF_HEAD_OFFICE" || role === "SUPERADMIN",
     rangeDays,
     setRangeDays: updateRangeDays,
     period: headOfficeData?.period || null,

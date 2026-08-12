@@ -1,5 +1,6 @@
 .distribution-page { background: var(--bg); min-height: calc(100vh - 76px); padding: 28px 32px; }
 .distribution-header { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; margin-bottom: 22px; }
+.distribution-header-controls { display: flex; flex-wrap: wrap; gap: 10px; }
 .distribution-eyebrow { color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .13em; margin: 0 0 8px; }
 .distribution-header h1, .distribution-detail-heading h2, .distribution-detail-section h3 { color: var(--text); font-family: "Plus Jakarta Sans"; margin: 0; }
 .distribution-header h1 { font-size: 26px; }
