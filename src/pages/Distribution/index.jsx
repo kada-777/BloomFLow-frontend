@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Eye, PackageCheck, X } from "lucide-react";
+import { Eye, PackageCheck, X, XCircle } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
+import ConfirmDialog from "../../components/common/ConfirmDialog/ConfirmDialog";
 import { getApiError } from "../../services/api";
 import { distributionService } from "../../services/distributionService";
 import "./distribution.css";
@@ -74,6 +75,8 @@ export default function Distribution() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [shippingPlanId, setShippingPlanId] = useState(null);
   const [receivingOrderId, setReceivingOrderId] = useState(null);
+  const [cancelTarget, setCancelTarget] = useState(null);
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -172,6 +175,28 @@ export default function Distribution() {
       setError(getApiError(requestError, "Order tidak dapat diterima."));
     } finally {
       setReceivingOrderId(null);
+    }
+  };
+
+  const closeCancelDialog = () => {
+    if (!cancellingOrderId) setCancelTarget(null);
+  };
+
+  const cancelOrder = async () => {
+    if (!cancelTarget) return;
+
+    setCancellingOrderId(cancelTarget.id);
+    setError("");
+    try {
+      const cancelled = await distributionService.cancelOrder(cancelTarget.id);
+      setDetail(cancelled);
+      setCancelTarget(null);
+      await loadOrders();
+      setSuccess(`Order #${cancelled.id} berhasil dibatalkan.`);
+    } catch (requestError) {
+      setError(getApiError(requestError, "Order tidak dapat dibatalkan."));
+    } finally {
+      setCancellingOrderId(null);
     }
   };
 
@@ -315,6 +340,17 @@ export default function Distribution() {
                     {receivingOrderId === detail.id ? "Menerima..." : "Receive"}
                   </button>
                 )}
+                {canShip && detail?.status === "DRAFT" && (
+                  <button
+                    type="button"
+                    className="distribution-secondary-button"
+                    onClick={() => setCancelTarget(detail)}
+                    disabled={cancellingOrderId === detail.id}
+                  >
+                    <XCircle size={15} />
+                    Batalkan Order
+                  </button>
+                )}
                 <button type="button" className="distribution-icon-button" onClick={closeDetail} aria-label="Tutup detail">
                   <X size={18} />
                 </button>
@@ -381,6 +417,18 @@ export default function Distribution() {
           </aside>
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(cancelTarget)}
+        title="Batalkan order distribution?"
+        message={cancelTarget ? `Order #${cancelTarget.id} akan dibatalkan dan tidak dapat dikirim.` : ""}
+        confirmText="Batalkan Order"
+        cancelText="Kembali"
+        danger
+        submitting={Boolean(cancellingOrderId)}
+        onConfirm={cancelOrder}
+        onCancel={closeCancelDialog}
+      />
     </div>
   );
 }

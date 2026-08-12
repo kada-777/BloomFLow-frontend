@@ -50,6 +50,10 @@ export const distributionService = {
     return unwrap(await api.post(`/distributions/${id}/ship`));
   },
 
+  async cancelOrder(id) {
+    return unwrap(await api.post(`/distributions/${id}/cancel`));
+  },
+
   async shipPlan(id) {
     return unwrap(await api.post(`/distribution-plans/${id}/ship`));
   },
