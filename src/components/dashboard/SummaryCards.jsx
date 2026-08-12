@@ -3,7 +3,7 @@ import SummaryCard from "./SummaryCard";
 
 const formatNumber = (value) => (value === null ? null : value.toLocaleString("en-US"));
 
-export default function SummaryCards({ summary, resourceErrors, onRetry, isBranchStaff }) {
+export default function SummaryCards({ summary, resourceErrors, onRetry, isBranchStaff, isHeadOffice }) {
   const cards = [
     { label: "Total Branches", value: formatNumber(summary.totalBranches), icon: Building2, error: resourceErrors.branches },
     { label: "Total Farms", value: formatNumber(summary.totalFarms), icon: Sprout, error: resourceErrors.farms },
@@ -16,7 +16,7 @@ export default function SummaryCards({ summary, resourceErrors, onRetry, isBranc
   ];
   const visibleCards = isBranchStaff
     ? cards.filter((card) => ["Total Branch Stock", "Flowers In Transit"].includes(card.label))
-    : cards.filter((card) => card.label !== "Flowers In Transit");
+    : cards.filter((card) => card.label !== "Flowers In Transit" && (!isHeadOffice || card.label !== "Forecast Harvested"));
 
   return (
     <section className={`dashboard-summary-grid${isBranchStaff ? " branch-staff" : ""}`} aria-label="Dashboard summary">

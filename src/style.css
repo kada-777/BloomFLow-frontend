@@ -980,6 +980,30 @@ form input {
 
 }
 
+.dashboard-range-filter {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.dashboard-range-filter select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 9px 12px;
+}
+
+.dashboard-export-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
 @media (max-width: 760px) {
   .dashboard-page {
     gap: 14px;

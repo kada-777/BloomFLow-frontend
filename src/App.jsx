@@ -16,6 +16,7 @@ import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import Receiving from "./pages/Receiving";
 import DailySales from "./pages/DailySales";
+import DashboardReport from "./components/dashboard/DashboardReport";
 function Protected() {
   const { user, isRestoring } = useAuth();
 
@@ -27,6 +28,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/auth" element={<Auth />} />
+      <Route path="/dashboard/report" element={<DashboardReport />} />
       <Route element={<Protected />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/inventory/:flowerId" element={<BatchDetail />} />
