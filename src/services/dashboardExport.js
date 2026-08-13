@@ -16,7 +16,7 @@ function formatDate(value) {
 
 export function exportDashboardCsv(report) {
   const rows = [
-    ["Period", `${report.period.days} days`],
+    ["Period", report.period.label || `${report.period.days} days`],
     ["Role", report.role || "Dashboard"],
     ["Branch", report.branchName || "All Branches"],
     ["Date From", formatDate(report.period.dateFrom)],
@@ -32,14 +32,14 @@ export function exportDashboardCsv(report) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `bloomflow-${String(report.role || "dashboard").toLowerCase().replaceAll(" ", "-")}-${report.period.days}d.csv`;
+  link.download = `bloomflow-${String(report.role || "dashboard").toLowerCase().replaceAll(" ", "-")}-${report.period.label || `${report.period.days}d`}.csv`;
   link.click();
   URL.revokeObjectURL(url);
 }
 
 export function openDashboardReport({ days, branch, role }) {
   const params = new URLSearchParams();
-  if (Number.isFinite(days)) params.set("days", String(days));
+  if (days) params.set("days", String(days));
   if (branch) params.set("branch", String(branch));
   if (role) params.set("role", String(role));
   const url = params.toString() ? `/dashboard/report?${params.toString()}` : "/dashboard/report";

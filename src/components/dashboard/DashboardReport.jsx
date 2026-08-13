@@ -42,9 +42,9 @@ export default function DashboardReport() {
   useEffect(() => {
     if (seeded.current) return;
     seeded.current = true;
-    const days = Number(searchParams.get("days"));
+    const days = searchParams.get("days");
     const branch = searchParams.get("branch");
-    if (Number.isFinite(days) && days !== rangeDays) setRangeDays(days);
+    if (["today", "7", "30", "60"].includes(days) && days !== String(rangeDays)) setRangeDays(days);
     if (branch && branch !== selectedBranch) setSelectedBranch(branch);
   }, [searchParams, rangeDays, selectedBranch, setRangeDays, setSelectedBranch]);
 
@@ -87,7 +87,7 @@ export default function DashboardReport() {
         <p className="eyebrow">BloomFlow Operations</p>
         <h1>{isBranchStaff ? "Branch Report" : isHeadOffice ? "Head Office Report" : "Super Admin Report"}</h1>
         <span className="dashboard-report-subtitle">
-          {report.branchName || "All Branches"} · Period: {report.rangeDays} days ({formatDate(report.period?.dateFrom)} to {formatDate(report.period?.dateTo)})
+           {report.branchName || "All Branches"} · Period: {report.period?.label || `${report.rangeDays} days`} ({formatDate(report.period?.dateFrom)} to {formatDate(report.period?.dateTo)})
         </span>
       </header>
       {error && (

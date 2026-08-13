@@ -97,7 +97,7 @@ export function useDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [refreshKey, setRefreshKey] = useState(0);
-  const [rangeDays, setRangeDays] = useState(7);
+  const [rangeDays, setRangeDays] = useState("today");
   const [activityPage, setActivityPage] = useState(1);
   const [headOfficeData, setHeadOfficeData] = useState(null);
 
