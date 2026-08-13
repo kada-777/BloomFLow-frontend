@@ -45,7 +45,7 @@ export default function FlowerItemCard({ index, item, flowers, errors = {}, read
             {readOnly ? (
               <div className="flower-item-readonly">{item[name] ?? "-"}</div>
             ) : (
-              <input type="number" min="0" step="0.01" value={item[name]} onChange={(event) => onChange(name, event.target.value)} />
+              <input type="number" min="0" step="1" value={item[name]} onChange={(event) => onChange(name, event.target.value)} />
             )}
             {itemError(name) && <em>{itemError(name)}</em>}
           </label>

@@ -23,8 +23,8 @@ function normalizeList(value) {
   return [];
 }
 
-function decimal(value) {
-  return /^\d+(\.\d{1,2})?$/.test(String(value).trim()) ? Number(value) : null;
+function integer(value) {
+  return /^\d+$/.test(String(value).trim()) ? Number(value) : null;
 }
 
 export function validateReceivingForm(payload) {
@@ -43,13 +43,13 @@ export function validateReceivingForm(payload) {
     flowerIds.add(String(item.flowerId));
 
     ["shippedQuantity", "actualReceivedQuantity", "acceptedQuantity", "unusableQuantity"].forEach((field) => {
-      if (decimal(item[field]) === null) errors[`${prefix}.${field}`] = "Enter a valid decimal number.";
+       if (integer(item[field]) === null) errors[`${prefix}.${field}`] = "Enter a whole number.";
     });
 
-    const shipped = decimal(item.shippedQuantity);
-    const actual = decimal(item.actualReceivedQuantity);
-    const accepted = decimal(item.acceptedQuantity);
-    const unusable = decimal(item.unusableQuantity);
+     const shipped = integer(item.shippedQuantity);
+     const actual = integer(item.actualReceivedQuantity);
+     const accepted = integer(item.acceptedQuantity);
+     const unusable = integer(item.unusableQuantity);
 
     if (shipped !== null && actual !== null && actual > shipped) {
       errors[`${prefix}.actualReceivedQuantity`] = "Actual received quantity cannot exceed shipped quantity.";
