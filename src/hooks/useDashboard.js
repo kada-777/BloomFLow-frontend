@@ -121,7 +121,7 @@ export function useDashboard() {
       requests.headOfficeDashboard = () => dashboardService.getHeadOfficeDashboard(rangeDays, activityPage, 10, selectedBranch);
       requests.branches = dashboardService.getBranches;
     } else if (role === "STAFF_BRANCH") {
-      requests.headOfficeDashboard = () => dashboardService.getHeadOfficeDashboard(rangeDays, activityPage, 10, selectedBranch);
+      requests.headOfficeDashboard = () => dashboardService.getBranchDashboard(rangeDays, activityPage, 10);
     } else {
       requests.dailySales = dashboardService.getDailySales;
       requests.branches = dashboardService.getBranches;
@@ -210,6 +210,7 @@ export function useDashboard() {
     refresh,
     isBranchStaff: role === "STAFF_BRANCH",
     isHeadOffice: role === "STAFF_HEAD_OFFICE",
+    isSuperAdmin: role === "SUPERADMIN",
     canSelectBranch: role === "STAFF_HEAD_OFFICE" || role === "SUPERADMIN",
     rangeDays,
     setRangeDays: updateRangeDays,

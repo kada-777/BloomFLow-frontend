@@ -77,7 +77,7 @@ export default function BatchDetail({ flowerId: selectedFlowerId, open, onClose 
             <thead>
               <tr>
                 <th>Source Batch</th>
-                <th>Received Date</th>
+                <th>Received at Branch</th>
                 <th>Total Flowers</th>
               </tr>
             </thead>
@@ -94,13 +94,7 @@ export default function BatchDetail({ flowerId: selectedFlowerId, open, onClose 
                           : <span>-</span>}
                       </div>
                     </td>
-                    <td>
-                      <div className="inventory-source-list">
-                        {lot.sourceBatches.length
-                          ? lot.sourceBatches.map((batch) => <span key={`${batch.batchNumber}-date`}>{formatDate(batch.receivedDate)}</span>)
-                          : <span>-</span>}
-                      </div>
-                    </td>
+                    <td>{formatDate(lot.receivedAt || lot.shippedAt)}</td>
                     <td>{formatQuantity(lot.quantity)}</td>
                   </tr>
                 ))

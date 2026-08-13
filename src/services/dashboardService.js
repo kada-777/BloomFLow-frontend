@@ -10,6 +10,11 @@ export const dashboardService = {
       params: { days, activityPage, activityLimit, branchId },
     }));
   },
+  async getBranchDashboard(days = 7, activityPage = 1, activityLimit = 10) {
+    return unwrap(await api.get("/dashboard/branch", {
+      params: { days, activityPage, activityLimit },
+    }));
+  },
   async getBranches() {
     return unwrap(await api.get("/branches", { params: { limit: "100" } }));
   },

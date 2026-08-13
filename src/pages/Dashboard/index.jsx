@@ -80,7 +80,7 @@ export default function Dashboard() {
               className="button"
               type="button"
               onClick={() =>
-                openDashboardReport({ days: rangeDays, branch: selectedBranch })
+                openDashboardReport({ days: rangeDays, branch: selectedBranch, role })
               }
               disabled={loading}
             >
@@ -95,6 +95,7 @@ export default function Dashboard() {
                   summary: data.summary,
                   activities: data.activities,
                   branchName: data.selectedBranchName,
+                  role,
                 })
               }
               disabled={loading}
@@ -122,7 +123,6 @@ export default function Dashboard() {
             onRetry={refresh}
             isBranchStaff={isBranchStaff}
             isHeadOffice={isHeadOffice}
-            isHeadOffice={isHeadOffice}
           />
           <div className="dashboard-chart-grid">
             <FlowerStatusPieChart
@@ -136,7 +136,7 @@ export default function Dashboard() {
           <RecentActivityTable
             activities={data.activities}
             loading={loading}
-            error={resourceErrors.dailySales || resourceErrors.receivings}
+            error={resourceErrors.headOfficeDashboard || resourceErrors.dailySales || resourceErrors.receivings}
             onRetry={refresh}
             pagination={data.activitiesPagination}
             onPageChange={setActivityPage}

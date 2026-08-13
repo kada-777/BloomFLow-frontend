@@ -7,6 +7,7 @@ import SummaryCards from "./SummaryCards";
 import FlowerStatusPieChart from "./FlowerStatusPieChart";
 import TopFlowerSalesChart from "./TopFlowerSalesChart";
 import RecentActivityTable from "./RecentActivityTable";
+import DashboardSkeleton from "./DashboardSkeleton";
 import "./DashboardReport.css";
 
 const DATE_OPTIONS = { dateStyle: "medium", timeZone: "UTC" };
@@ -21,6 +22,7 @@ function formatDate(value) {
 export default function DashboardReport() {
   const { user, isRestoring } = useAuth();
   const [searchParams] = useSearchParams();
+  const requestedRole = searchParams.get("role");
   const {
     data,
     loading,
@@ -72,7 +74,8 @@ export default function DashboardReport() {
     resourceErrors,
   };
 
-  const handleCsv = () => exportDashboardCsv({ period, summary: data.summary, activities: data.activities, branchName: data.selectedBranchName });
+  const role = isBranchStaff ? "Branch Staff" : isHeadOffice ? "Head Office" : "Super Admin";
+  const handleCsv = () => exportDashboardCsv({ period, summary: data.summary, activities: data.activities, branchName: data.selectedBranchName, role: requestedRole || role });
 
   return (
     <div className="dashboard-report">
@@ -93,26 +96,32 @@ export default function DashboardReport() {
           <button className="text-button" type="button" onClick={refresh}>Retry</button>
         </div>
       )}
-      <SummaryCards
-        summary={report.summary}
-        resourceErrors={resourceErrors}
-        onRetry={refresh}
-        isBranchStaff={isBranchStaff}
-        isHeadOffice={isHeadOffice}
-      />
-      <div className="dashboard-chart-grid">
-        <FlowerStatusPieChart data={report.flowerStatus} loading={loading} error={resourceErrors.branchInventory} onRetry={refresh} />
-        <TopFlowerSalesChart data={report.topFlowerSales} loading={loading} />
-      </div>
-      <RecentActivityTable
-        activities={report.activities}
-        loading={loading}
-        error={resourceErrors.dailySales || resourceErrors.receivings}
-        onRetry={refresh}
-        pagination={report.activitiesPagination}
-        paginationDisabled={loading}
-        isHeadOffice={isHeadOffice}
-      />
+      {loading ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          <SummaryCards
+            summary={report.summary}
+            resourceErrors={resourceErrors}
+            onRetry={refresh}
+            isBranchStaff={isBranchStaff}
+            isHeadOffice={isHeadOffice}
+          />
+          <div className="dashboard-chart-grid">
+            <FlowerStatusPieChart data={report.flowerStatus} loading={loading} error={resourceErrors.branchInventory} onRetry={refresh} />
+            <TopFlowerSalesChart data={report.topFlowerSales} loading={loading} />
+          </div>
+          <RecentActivityTable
+            activities={report.activities}
+            loading={loading}
+            error={resourceErrors.headOfficeDashboard || resourceErrors.dailySales || resourceErrors.receivings}
+            onRetry={refresh}
+            pagination={report.activitiesPagination}
+            paginationDisabled={loading}
+            isHeadOffice={isHeadOffice}
+          />
+        </>
+      )}
     </div>
   );
 }

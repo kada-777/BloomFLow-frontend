@@ -760,7 +760,19 @@ form input {
 }
 
 .dashboard-summary-grid.branch-staff {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dashboard-summary-grid.head-office {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.dashboard-summary-grid.head-office > :nth-child(-n + 4) {
+  grid-column: span 3;
+}
+
+.dashboard-summary-grid.head-office > :nth-child(n + 5) {
+  grid-column: span 4;
 }
 
 .dashboard-summary-card,
@@ -805,6 +817,14 @@ form input {
   display: block;
   font-size: 10px;
   margin-top: 6px;
+}
+
+.dashboard-summary-breakdown {
+  color: var(--muted);
+  display: grid;
+  font-size: 10px;
+  gap: 3px;
+  margin-top: 8px;
 }
 
 .dashboard-summary-card .dashboard-state {
@@ -1023,6 +1043,14 @@ form input {
 
   .dashboard-summary-grid.branch-staff {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-summary-grid.head-office {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .dashboard-summary-grid.head-office > :nth-child(n) {
+    grid-column: span 1;
   }
 
   .dashboard-chart-grid,
