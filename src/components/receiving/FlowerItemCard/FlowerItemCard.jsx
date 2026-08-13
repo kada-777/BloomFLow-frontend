@@ -16,10 +16,10 @@ export default function FlowerItemCard({ index, item, flowers, errors = {}, read
       <header className="flower-item-header">
         <div>
           <span>FLOWER ITEM {index + 1}</span>
-          <h3>Detail bunga dan hasil QC</h3>
+          <h3>Flower details and quality control results</h3>
         </div>
         {canRemove && (
-          <button className="flower-item-remove" type="button" onClick={onRemove} disabled={readOnly} aria-label={`Hapus flower item ${index + 1}`}>
+          <button className="flower-item-remove" type="button" onClick={onRemove} disabled={readOnly} aria-label={`Delete flower item ${index + 1}`}>
             <Trash2 size={17} />
           </button>
         )}
@@ -32,7 +32,7 @@ export default function FlowerItemCard({ index, item, flowers, errors = {}, read
             <div className="flower-item-readonly">{item.flower?.variety || item.flower?.name || item.flowerName || item.flowerId || "-"}</div>
           ) : (
             <select value={item.flowerId} onChange={(event) => onChange("flowerId", event.target.value)}>
-              <option value="">Pilih flower</option>
+              <option value="">Select a flower</option>
               {flowers.map((flower) => <option key={flower.id} value={flower.id}>{flower.name} · {flower.variety}</option>)}
             </select>
           )}
@@ -56,7 +56,7 @@ export default function FlowerItemCard({ index, item, flowers, errors = {}, read
           {readOnly ? (
             <div className="flower-item-readonly flower-item-notes">{item.unusableNotes || "-"}</div>
           ) : (
-            <textarea value={item.unusableNotes} onChange={(event) => onChange("unusableNotes", event.target.value)} placeholder="Catatan kerusakan atau hasil QC" rows="3" />
+            <textarea value={item.unusableNotes} onChange={(event) => onChange("unusableNotes", event.target.value)} placeholder="Damage notes or quality control results" rows="3" />
           )}
         </label>
       </div>

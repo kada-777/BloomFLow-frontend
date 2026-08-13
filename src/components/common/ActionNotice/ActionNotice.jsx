@@ -9,7 +9,7 @@ export default function ActionNotice({ message, tone = "info", onClose, onAction
       <span>{message}</span>
       <div className="action-notice-actions">
         {onAction && <button className="action-notice-action" type="button" onClick={onAction}>{actionLabel}</button>}
-        {onClose && <button className="action-notice-close" type="button" onClick={onClose} aria-label="Tutup notifikasi"><X size={16} /></button>}
+        {onClose && <button className="action-notice-close" type="button" onClick={onClose} aria-label="Close notification"><X size={16} /></button>}
       </div>
     </div>
   );

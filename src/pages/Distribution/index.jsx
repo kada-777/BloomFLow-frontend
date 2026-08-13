@@ -93,7 +93,7 @@ export default function Distribution() {
       setOrders(payload?.data || []);
       setPagination(payload?.pagination || null);
     } catch (requestError) {
-      setError(getApiError(requestError, "Riwayat distribution tidak dapat dimuat."));
+      setError(getApiError(requestError, "Unable to load distribution history."));
     } finally {
       setLoading(false);
     }
@@ -131,7 +131,7 @@ export default function Distribution() {
     try {
       setDetail(await distributionService.getOrder(orderId));
     } catch (requestError) {
-      setError(getApiError(requestError, "Detail pengiriman tidak dapat dimuat."));
+      setError(getApiError(requestError, "Unable to load shipment details."));
     } finally {
       setDetailLoading(false);
     }
@@ -148,9 +148,9 @@ export default function Distribution() {
     try {
       await distributionService.shipPlan(planId);
       await loadOrders();
-      setSuccess(`Plan #${planId} berhasil dikirim ke semua cabang.`);
+      setSuccess(`Plan #${planId} was shipped to all branches.`);
     } catch (requestError) {
-      setError(getApiError(requestError, "Plan tidak dapat dikirim."));
+      setError(getApiError(requestError, "Unable to ship the plan."));
     } finally {
       setShippingPlanId(null);
     }
@@ -160,7 +160,7 @@ export default function Distribution() {
     if (!detail) return;
     const payload = buildReceivePayload(detail);
     if (!payload.items.length) {
-      setError("Order belum memiliki alokasi batch untuk diterima.");
+      setError("This order has no batch allocations to receive.");
       return;
     }
 
@@ -170,9 +170,9 @@ export default function Distribution() {
       const received = await distributionService.receiveOrder(detail.id, payload);
       setDetail(received);
       await loadOrders();
-      setSuccess(`Order #${detail.id} berhasil diterima.`);
+      setSuccess(`Order #${detail.id} was received successfully.`);
     } catch (requestError) {
-      setError(getApiError(requestError, "Order tidak dapat diterima."));
+      setError(getApiError(requestError, "Unable to receive the order."));
     } finally {
       setReceivingOrderId(null);
     }
@@ -192,9 +192,9 @@ export default function Distribution() {
       setDetail(cancelled);
       setCancelTarget(null);
       await loadOrders();
-      setSuccess(`Order #${cancelled.id} berhasil dibatalkan.`);
+      setSuccess(`Order #${cancelled.id} was cancelled successfully.`);
     } catch (requestError) {
-      setError(getApiError(requestError, "Order tidak dapat dibatalkan."));
+      setError(getApiError(requestError, "Unable to cancel the order."));
     } finally {
       setCancellingOrderId(null);
     }
@@ -205,8 +205,8 @@ export default function Distribution() {
       <header className="distribution-header">
         <div>
           <p className="distribution-eyebrow">FULFILMENT HISTORY</p>
-          <h1>Riwayat Distribution</h1>
-          <p>Lihat status pengiriman, detail cabang, dan kirim semua order dalam satu plan.</p>
+          <h1>Distribution History</h1>
+          <p>Review shipment status and branch details, then ship all orders in a plan.</p>
         </div>
         <div className="distribution-header-controls">
           {!canShip && (
@@ -222,7 +222,7 @@ export default function Distribution() {
             <label className="distribution-sort-control">
               <span>Status</span>
               <select value={status} onChange={(event) => changeStatus(event.target.value)}>
-                <option value="all">Semua Status</option>
+                <option value="all">All Statuses</option>
                 <option value="draft">Draft</option>
                 <option value="in_transit">In Transit</option>
                 <option value="received">Received</option>
@@ -238,9 +238,9 @@ export default function Distribution() {
 
       <section className="distribution-history-panel">
         {loading ? (
-          <div className="distribution-state">Memuat riwayat distribution...</div>
+          <div className="distribution-state">Loading distribution history...</div>
         ) : orders.length === 0 ? (
-          <div className="distribution-state">Belum ada distribution order.</div>
+          <div className="distribution-state">No distribution orders available.</div>
         ) : (
           <>
             <div className="distribution-table-wrap">
@@ -249,10 +249,10 @@ export default function Distribution() {
                   <tr>
                     <th>Order ID</th>
                     <th>Plan ID</th>
-                    <th>Cabang</th>
+                    <th>Branch</th>
                     <th>Status</th>
-                    <th>Waktu kirim</th>
-                    <th>Aksi</th>
+                    <th>Shipped At</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -264,7 +264,7 @@ export default function Distribution() {
                       <tr key={order.id}>
                         <td>Order #{order.id}</td>
                         <td>{order.distributionPlanId ? `Plan #${order.distributionPlanId}` : "-"}</td>
-                        <td>{order.branch?.name || `Cabang #${order.branchId}`}</td>
+                        <td>{order.branch?.name || `Branch #${order.branchId}`}</td>
                         <td>
                           <span className={`distribution-status status-${order.status.toLowerCase()}`}>
                             {statusLabel(order.status)}
@@ -285,7 +285,7 @@ export default function Distribution() {
                               >
                                 <PackageCheck size={15} />
                                 {shippingPlanId === order.distributionPlanId
-                                  ? "Mengirim..."
+                                  ? "Shipping..."
                                   : `Ship All Plan #${order.distributionPlanId}`}
                               </button>
                             )}
@@ -306,7 +306,7 @@ export default function Distribution() {
               >
                 Previous
               </button>
-              <span>Halaman {pagination?.page || page} dari {pagination?.totalPages || 1}</span>
+              <span>Page {pagination?.page || page} of {pagination?.totalPages || 1}</span>
               <button
                 className="distribution-secondary-button"
                 type="button"
@@ -322,11 +322,11 @@ export default function Distribution() {
 
       {(detail || detailLoading) && (
         <div className="distribution-detail-backdrop" role="presentation">
-          <aside className="distribution-detail-panel" aria-label="Detail pengiriman">
+          <aside className="distribution-detail-panel" aria-label="Shipment details">
             <div className="distribution-detail-heading">
               <div>
                 <p className="distribution-eyebrow">SHIPMENT DETAIL</p>
-                <h2>{detail ? `Order #${detail.id}` : "Memuat detail..."}</h2>
+                <h2>{detail ? `Order #${detail.id}` : "Loading details..."}</h2>
               </div>
               <div className="distribution-detail-heading-actions">
                 {canReceive && detail?.status === "IN_TRANSIT" && (
@@ -337,7 +337,7 @@ export default function Distribution() {
                     disabled={receivingOrderId === detail.id}
                   >
                     <PackageCheck size={15} />
-                    {receivingOrderId === detail.id ? "Menerima..." : "Receive"}
+                    {receivingOrderId === detail.id ? "Receiving..." : "Receive"}
                   </button>
                 )}
                 {canShip && detail?.status === "DRAFT" && (
@@ -348,38 +348,38 @@ export default function Distribution() {
                     disabled={cancellingOrderId === detail.id}
                   >
                     <XCircle size={15} />
-                    Batalkan Order
+                    Cancel Order
                   </button>
                 )}
-                <button type="button" className="distribution-icon-button" onClick={closeDetail} aria-label="Tutup detail">
+                <button type="button" className="distribution-icon-button" onClick={closeDetail} aria-label="Close details">
                   <X size={18} />
                 </button>
               </div>
             </div>
             {detailLoading ? (
-              <div className="distribution-state">Memuat detail pengiriman...</div>
+              <div className="distribution-state">Loading shipment details...</div>
             ) : detail && (
               <>
                 <div className="distribution-detail-meta">
-                  <span>{detail.branch?.name || `Cabang #${detail.branchId}`}</span>
-                  <span>{detail.distributionPlan?.id ? `Plan #${detail.distributionPlan.id}` : "Tanpa plan"}</span>
+                  <span>{detail.branch?.name || `Branch #${detail.branchId}`}</span>
+                  <span>{detail.distributionPlan?.id ? `Plan #${detail.distributionPlan.id}` : "No plan"}</span>
                   <span className={`distribution-status status-${detail.status.toLowerCase()}`}>
                     {statusLabel(detail.status)}
                   </span>
-                  <span>Dikirim: {formatDate(detail.shippedAt)}</span>
+                  <span>Shipped: {formatDate(detail.shippedAt)}</span>
                 </div>
 
                 <section className="distribution-detail-section">
-                  <h3>Item bunga</h3>
+                  <h3>Flower Items</h3>
                   {detail.items?.length ? (
                     <table className="distribution-mini-table">
                       <thead>
-                        <tr><th>Bunga</th><th>Final Qty</th><th>Rekomendasi</th></tr>
+                        <tr><th>Flower</th><th>Final Qty</th><th>Recommendation</th></tr>
                       </thead>
                       <tbody>
                         {detail.items.map((item) => (
                           <tr key={`${item.flowerId}-${item.finalQuantity}`}>
-                            <td>{item.flower?.name || `Bunga #${item.flowerId}`}{item.flower?.variety ? ` · ${item.flower.variety}` : ""}</td>
+                            <td>{item.flower?.name || `Flower #${item.flowerId}`}{item.flower?.variety ? ` · ${item.flower.variety}` : ""}</td>
                             <td>{quantityText(item.finalQuantity)}</td>
                             <td>{quantityText(item.recommendedQuantity)}</td>
                           </tr>
@@ -387,29 +387,29 @@ export default function Distribution() {
                       </tbody>
                     </table>
                   ) : (
-                    <p className="distribution-muted">Tidak ada item plan untuk order ini.</p>
+                    <p className="distribution-muted">There are no plan items for this order.</p>
                   )}
                 </section>
 
                 <section className="distribution-detail-section">
-                  <h3>Alokasi batch</h3>
+                  <h3>Batch Allocations</h3>
                   {detail.allocations?.length ? (
                     <table className="distribution-mini-table">
                       <thead>
-                        <tr><th>Batch</th><th>Bunga</th><th>Quantity</th></tr>
+                        <tr><th>Batch</th><th>Flower</th><th>Quantity</th></tr>
                       </thead>
                       <tbody>
                         {detail.allocations.map((allocation) => (
                           <tr key={allocation.id}>
                             <td>{allocation.batch?.batchNumber || `Batch #${allocation.batch?.id}`}</td>
-                            <td>{allocation.batch?.flower?.name || `Bunga #${allocation.batch?.flowerId}`}</td>
+                            <td>{allocation.batch?.flower?.name || `Flower #${allocation.batch?.flowerId}`}</td>
                             <td>{quantityText(allocation.quantity)}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   ) : (
-                    <p className="distribution-muted">Belum ada alokasi batch. Order belum dikirim.</p>
+                    <p className="distribution-muted">No batch allocations are available. The order has not been shipped.</p>
                   )}
                 </section>
               </>
@@ -420,10 +420,10 @@ export default function Distribution() {
 
       <ConfirmDialog
         open={Boolean(cancelTarget)}
-        title="Batalkan order distribution?"
-        message={cancelTarget ? `Order #${cancelTarget.id} akan dibatalkan dan tidak dapat dikirim.` : ""}
-        confirmText="Batalkan Order"
-        cancelText="Kembali"
+        title="Cancel Distribution Order?"
+        message={cancelTarget ? `Order #${cancelTarget.id} will be cancelled and cannot be shipped.` : ""}
+        confirmText="Cancel Order"
+        cancelText="Back"
         danger
         submitting={Boolean(cancellingOrderId)}
         onConfirm={cancelOrder}

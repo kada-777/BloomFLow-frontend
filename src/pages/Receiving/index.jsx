@@ -17,7 +17,7 @@ export default function Receiving() {
 
   const columns = [
     { key: "id", label: "RECEIVING ID", render: (item) => <strong>REC-{item.id}</strong> },
-    { key: "receivedDate", label: "TANGGAL DITERIMA", render: (item) => formatDate(item.receivedDate) },
+    { key: "receivedDate", label: "RECEIVED DATE", render: (item) => formatDate(item.receivedDate) },
     {
       key: "farm",
       label: "FARM",
@@ -31,7 +31,7 @@ export default function Receiving() {
       label: "FLOWER",
       render: (item) => {
         const count = item._count?.items;
-        const summary = count ? `${count} jenis bunga` : "-";
+        const summary = count ? `${count} flower type${count === 1 ? "" : "s"}` : "-";
         return <span className="receiving-truncated" title={summary}>{summary}</span>;
       },
     },
@@ -43,7 +43,7 @@ export default function Receiving() {
         <div>
           <p className="receiving-page-eyebrow">HEAD OFFICE OPERATIONS</p>
           <h1>Receiving & Quality Control</h1>
-          <p>Catat penerimaan bunga dari kebun dan selesaikan quality control Head Office.</p>
+          <p>Record flower receipts from farms and complete Head Office quality control.</p>
         </div>
         <button className="receiving-new-button" type="button" onClick={receiving.openCreate}>
           <Plus size={18} /> New Receiving
@@ -51,15 +51,15 @@ export default function Receiving() {
       </header>
 
       <div className="receiving-filter-card">
-        <SearchBar value={receiving.searchTerm} onChange={receiving.setSearchTerm} placeholder="Cari ID, farm, atau farm ID..." ariaLabel="Cari receiving" />
+        <SearchBar value={receiving.searchTerm} onChange={receiving.setSearchTerm} placeholder="Search ID, farm, or farm ID..." ariaLabel="Search receiving" />
         <label className="receiving-filter-field">
-          <span>Tanggal</span>
+          <span>Date</span>
           <input type="date" value={receiving.selectedDate} onChange={(event) => receiving.setSelectedDate(event.target.value)} />
         </label>
         <label className="receiving-filter-field">
           <span>Farm</span>
           <select value={receiving.selectedFarm} onChange={(event) => receiving.setSelectedFarm(event.target.value)}>
-            <option value="all">Semua Farm</option>
+            <option value="all">All Farms</option>
             {receiving.farms.map((farm) => <option key={farm.id} value={farm.id}>{farm.name}</option>)}
           </select>
         </label>
@@ -72,7 +72,7 @@ export default function Receiving() {
         columns={columns}
         data={receiving.filteredReceivings}
         loading={receiving.loading}
-        emptyMessage="Belum ada data receiving yang cocok."
+        emptyMessage="No matching receiving records found."
         className="receiving-table-card table-card"
         renderActions={(item) => (
           <button className="receiving-view-button" type="button" onClick={() => receiving.openDetail(item.id)}>

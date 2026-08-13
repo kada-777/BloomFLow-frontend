@@ -820,6 +820,7 @@ form input {
 .dashboard-filter-row {
   align-items: end;
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   justify-content: flex-start;
 }
@@ -1007,7 +1008,6 @@ form input {
 .dashboard-export-actions {
   display: flex;
   gap: 10px;
-  justify-content: flex-end;
   margin-bottom: 16px;
 }
 
@@ -1050,7 +1050,12 @@ form input {
 
   .dashboard-range-filter,
   .dashboard-branch-selector,
-  .dashboard-branch-selector select {
+  .dashboard-branch-selector select,
+  .dashboard-export-actions {
     width: 100%;
+  }
+
+  .dashboard-export-actions .button {
+    flex: 1;
   }
 }

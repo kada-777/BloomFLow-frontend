@@ -47,8 +47,8 @@ export function validateDailySalesForm(payload) {
   const items = payload.items || [];
   const flowerIds = new Set();
 
-  if (!payload.salesDate) errors.salesDate = "Tanggal sales wajib diisi.";
-  if (!items.length) errors.items = "Minimal satu jenis bunga harus ditambahkan.";
+  if (!payload.salesDate) errors.salesDate = "The sales date is required.";
+  if (!items.length) errors.items = "Add at least one flower type.";
 
   items.forEach((item, index) => {
     const prefix = `items.${index}`;
@@ -56,14 +56,14 @@ export function validateDailySalesForm(payload) {
     const soldQuantity = decimal(item.soldQuantity);
     const damagedQuantity = decimal(item.damagedQuantity);
 
-    if (!flowerId) errors[`${prefix}.flowerId`] = "Flower wajib dipilih.";
-    if (flowerId && flowerIds.has(flowerId)) errors[`${prefix}.flowerId`] = "Flower tidak boleh sama.";
+    if (!flowerId) errors[`${prefix}.flowerId`] = "A flower must be selected.";
+    if (flowerId && flowerIds.has(flowerId)) errors[`${prefix}.flowerId`] = "Flowers cannot be duplicated.";
     if (flowerId) flowerIds.add(flowerId);
 
-    if (soldQuantity === null) errors[`${prefix}.soldQuantity`] = "Masukkan angka desimal yang valid.";
-    if (damagedQuantity === null) errors[`${prefix}.damagedQuantity`] = "Masukkan angka desimal yang valid.";
+    if (soldQuantity === null) errors[`${prefix}.soldQuantity`] = "Enter a valid decimal number.";
+    if (damagedQuantity === null) errors[`${prefix}.damagedQuantity`] = "Enter a valid decimal number.";
     if (soldQuantity !== null && damagedQuantity !== null && soldQuantity + damagedQuantity <= 0) {
-      errors[`${prefix}.soldQuantity`] = "Sold dan damaged quantity harus lebih dari nol.";
+      errors[`${prefix}.soldQuantity`] = "Sold and damaged quantities must total more than zero.";
     }
   });
 
@@ -132,10 +132,10 @@ export default function useDailySales() {
         setSales(normalizeList(salesResult.value.data));
         setPagination(salesResult.value.pagination);
         if (flowersResult.status === "rejected") {
-          setError(getDailySalesError(flowersResult.reason, "Data flower gagal dimuat."));
+          setError(getDailySalesError(flowersResult.reason, "Unable to load flowers."));
         }
       } else {
-        setError(getDailySalesError(salesResult.reason, "Data daily sales gagal dimuat."));
+        setError(getDailySalesError(salesResult.reason, "Unable to load daily sales."));
       }
 
       if (flowersResult.status === "fulfilled") setFlowers(normalizeList(flowersResult.value));
@@ -178,7 +178,7 @@ export default function useDailySales() {
     try {
       setDetail(await dailySalesService.getById(id));
     } catch (requestError) {
-      setDetailError(getDailySalesError(requestError, "Detail daily sales gagal dimuat."));
+      setDetailError(getDailySalesError(requestError, "Unable to load daily sales details."));
     } finally {
       setDetailLoading(false);
     }
@@ -194,7 +194,7 @@ export default function useDailySales() {
   const submitCreate = async (payload) => {
     const validationErrors = validateDailySalesForm(payload);
     if (Object.keys(validationErrors).length) {
-      setFormError("Periksa kembali field Daily Sales yang belum valid.");
+      setFormError("Review the invalid Daily Sales fields.");
       return { errors: validationErrors };
     }
 
@@ -203,11 +203,11 @@ export default function useDailySales() {
     try {
       await dailySalesService.create(normalizePayload(payload));
       setFormOpen(false);
-      setSuccessMessage("Daily Sales berhasil disimpan.");
+      setSuccessMessage("Daily Sales saved successfully.");
       await refresh();
       return { errors: {} };
     } catch (requestError) {
-      const message = getDailySalesError(requestError, "Daily Sales gagal disimpan.");
+      const message = getDailySalesError(requestError, "Unable to save Daily Sales.");
       setFormError(message);
       return { errors: { form: message } };
     } finally {

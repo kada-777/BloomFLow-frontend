@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import "./SearchBar.css";
 
-export default function SearchBar({ value, onChange, placeholder = "Cari...", ariaLabel = "Search" }) {
+export default function SearchBar({ value, onChange, placeholder = "Search...", ariaLabel = "Search" }) {
   return (
     <div className="search-card generic-search-card">
       <label className="search-input" htmlFor={ariaLabel.replace(/\s+/g, "-").toLowerCase()}>

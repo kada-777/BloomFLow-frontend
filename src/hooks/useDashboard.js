@@ -196,7 +196,6 @@ export function useDashboard() {
           : selectedRows
             .filter((row) => row.flowerStatus === "FRESH" || row.flowerStatus === "GRADE_C")
             .reduce((total, row) => total + toNumber(row.quantity), 0),
-        forecastHarvested: null,
         flowersInTransit: null,
       },
       flowerStatus: buildFlowerStatus(selectedRows),

@@ -42,7 +42,7 @@ export default function ResourceFormCard({
     const nextErrors = {};
     fields.forEach((field) => {
       if (field.required && !String(values[field.name] || "").trim()) {
-        nextErrors[field.name] = `${field.label} wajib diisi.`;
+        nextErrors[field.name] = `${field.label} is required.`;
       }
     });
 
@@ -63,7 +63,7 @@ export default function ResourceFormCard({
             <h2 id="resource-form-title">{title}</h2>
             <p>{subtitle}</p>
           </div>
-          <button className="resource-form-close" type="button" onClick={onClose} disabled={submitting} aria-label="Tutup dialog">
+          <button className="resource-form-close" type="button" onClick={onClose} disabled={submitting} aria-label="Close dialog">
             <X size={20} />
           </button>
         </header>
@@ -75,7 +75,7 @@ export default function ResourceFormCard({
               <span>{field.label}</span>
               {field.type === "select" ? (
                 <select value={values[field.name]} onChange={(event) => handleChange(field.name, event.target.value)} disabled={submitting}>
-                  <option value="">Pilih {field.label.toLowerCase()}</option>
+                  <option value="">Select {field.label.toLowerCase()}</option>
                   {field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                 </select>
               ) : (
@@ -93,9 +93,9 @@ export default function ResourceFormCard({
         </div>
 
         <footer className="resource-form-footer">
-          <button className="resource-form-secondary" type="button" onClick={onClose} disabled={submitting}>Batal</button>
+          <button className="resource-form-secondary" type="button" onClick={onClose} disabled={submitting}>Cancel</button>
           <button className="resource-form-primary" type="submit" disabled={submitting}>
-            {submitting ? "Menyimpan..." : mode === "edit" ? <><Save size={17} /> Simpan Perubahan</> : <><UserPlus size={17} /> Tambah Data</>}
+            {submitting ? "Saving..." : mode === "edit" ? <><Save size={17} /> Save Changes</> : <><UserPlus size={17} /> Add Data</>}
           </button>
         </footer>
       </form>

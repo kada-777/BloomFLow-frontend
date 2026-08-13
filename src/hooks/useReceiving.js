@@ -31,19 +31,19 @@ export function validateReceivingForm(payload) {
   const errors = {};
   const items = payload.items || [];
 
-  if (!payload.farmId) errors.farmId = "Farm wajib dipilih.";
-  if (!payload.receivedDate) errors.receivedDate = "Tanggal diterima wajib diisi.";
-  if (!items.length) errors.items = "Minimal satu jenis bunga harus ditambahkan.";
+  if (!payload.farmId) errors.farmId = "A farm must be selected.";
+  if (!payload.receivedDate) errors.receivedDate = "The received date is required.";
+  if (!items.length) errors.items = "Add at least one flower type.";
 
   const flowerIds = new Set();
   items.forEach((item, index) => {
     const prefix = `items.${index}`;
-    if (!item.flowerId) errors[`${prefix}.flowerId`] = "Flower wajib dipilih.";
-    if (item.flowerId && flowerIds.has(String(item.flowerId))) errors[`${prefix}.flowerId`] = "Flower tidak boleh sama.";
+    if (!item.flowerId) errors[`${prefix}.flowerId`] = "A flower must be selected.";
+    if (item.flowerId && flowerIds.has(String(item.flowerId))) errors[`${prefix}.flowerId`] = "Flowers cannot be duplicated.";
     flowerIds.add(String(item.flowerId));
 
     ["shippedQuantity", "actualReceivedQuantity", "acceptedQuantity", "unusableQuantity"].forEach((field) => {
-      if (decimal(item[field]) === null) errors[`${prefix}.${field}`] = "Masukkan angka desimal yang valid.";
+      if (decimal(item[field]) === null) errors[`${prefix}.${field}`] = "Enter a valid decimal number.";
     });
 
     const shipped = decimal(item.shippedQuantity);
@@ -52,10 +52,10 @@ export function validateReceivingForm(payload) {
     const unusable = decimal(item.unusableQuantity);
 
     if (shipped !== null && actual !== null && actual > shipped) {
-      errors[`${prefix}.actualReceivedQuantity`] = "Actual received tidak boleh melebihi shipped quantity.";
+      errors[`${prefix}.actualReceivedQuantity`] = "Actual received quantity cannot exceed shipped quantity.";
     }
     if (accepted !== null && unusable !== null && actual !== null && accepted + unusable !== actual) {
-      errors[`${prefix}.acceptedQuantity`] = "Accepted + unusable harus sama dengan actual received.";
+      errors[`${prefix}.acceptedQuantity`] = "Accepted plus unusable quantity must equal actual received quantity.";
     }
   });
 
@@ -111,11 +111,11 @@ export default function useReceiving() {
       setReceivings(normalizeList(receivingResult.value.data));
       setPagination(receivingResult.value.pagination);
     }
-    else setError(getApiError(receivingResult.reason, "Data receiving gagal dimuat."));
+    else setError(getApiError(receivingResult.reason, "Unable to load receiving data."));
     if (farmResult.status === "fulfilled") setFarms(normalizeList(farmResult.value));
-    else setError((current) => current || getApiError(farmResult.reason, "Data farm gagal dimuat."));
+    else setError((current) => current || getApiError(farmResult.reason, "Unable to load farms."));
     if (flowerResult.status === "fulfilled") setFlowers(normalizeList(flowerResult.value));
-    else setError((current) => current || getApiError(flowerResult.reason, "Data flower gagal dimuat."));
+    else setError((current) => current || getApiError(flowerResult.reason, "Unable to load flowers."));
     setLoading(false);
   }, [page]);
 
@@ -167,7 +167,7 @@ export default function useReceiving() {
     try {
       setDetail(await receivingService.getById(id));
     } catch (requestError) {
-      setDetailError(getApiError(requestError, "Detail receiving gagal dimuat."));
+      setDetailError(getApiError(requestError, "Unable to load receiving details."));
     } finally {
       setDetailLoading(false);
     }
@@ -183,7 +183,7 @@ export default function useReceiving() {
   const submitCreate = async (payload) => {
     const validationErrors = validateReceivingForm(payload);
     if (Object.keys(validationErrors).length) {
-      setFormError("Periksa kembali field Receiving yang belum valid.");
+      setFormError("Review the invalid Receiving fields.");
       return { errors: validationErrors };
     }
 
@@ -192,11 +192,11 @@ export default function useReceiving() {
     try {
       await receivingService.create(normalizePayload(payload));
       setFormOpen(false);
-      setSuccessMessage("Receiving berhasil disimpan.");
+      setSuccessMessage("Receiving saved successfully.");
       await refresh();
       return { errors: {} };
     } catch (requestError) {
-      const message = getApiError(requestError, "Receiving gagal disimpan.");
+      const message = getApiError(requestError, "Unable to save Receiving.");
       setFormError(message);
       return { errors: { form: message } };
     } finally {

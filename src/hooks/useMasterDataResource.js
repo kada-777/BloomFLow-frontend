@@ -32,7 +32,7 @@ export default function useMasterDataResource({ resource, searchableFields, sort
       setItems(normalizeList(result.data));
       setPagination(result.pagination);
     } catch (requestError) {
-      setError(getApiError(requestError, "Data gagal dimuat."));
+      setError(getApiError(requestError, "Unable to load data."));
     } finally {
       setLoading(false);
     }
@@ -93,7 +93,7 @@ export default function useMasterDataResource({ resource, searchableFields, sort
       setSelectedItem(null);
       await refresh();
     } catch (requestError) {
-      setFormError(getApiError(requestError, "Data gagal disimpan."));
+      setFormError(getApiError(requestError, "Unable to save data."));
     } finally {
       setSubmitting(false);
     }
@@ -105,7 +105,7 @@ export default function useMasterDataResource({ resource, searchableFields, sort
   const confirmDelete = () => {
     // TODO: connect masterDataService.remove(resource, deleteTarget.id) when DELETE is available.
     setDeleteTarget(null);
-    setNotice("Delete API backend belum tersedia.");
+    setNotice("The backend delete API is not available yet.");
   };
 
   return {

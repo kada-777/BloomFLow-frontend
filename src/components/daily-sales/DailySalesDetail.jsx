@@ -15,16 +15,16 @@ export default function DailySalesDetail({ open, detail, loading, error, onClose
           <div>
             <span className="daily-sales-eyebrow">BRANCH OPERATIONS</span>
             <h2 id="daily-sales-detail-title">Sales Detail</h2>
-            <p>Ringkasan penjualan bunga harian.</p>
+            <p>Daily flower sales summary.</p>
           </div>
-          <button className="daily-sales-close" type="button" onClick={onClose} aria-label="Tutup Sales Detail"><X size={20} /></button>
+          <button className="daily-sales-close" type="button" onClick={onClose} aria-label="Close Sales Detail"><X size={20} /></button>
         </header>
         <div className="daily-sales-modal-body">
-          {loading && <div className="daily-sales-state">Memuat detail...</div>}
+          {loading && <div className="daily-sales-state">Loading details...</div>}
           {!loading && error && <div className="daily-sales-error" role="alert">{error}</div>}
           {!loading && !error && detail && (
             <>
-              <div className="daily-sales-detail-date"><span>TANGGAL SALES</span><strong>{formatDate(detail.salesDate)}</strong></div>
+              <div className="daily-sales-detail-date"><span>SALES DATE</span><strong>{formatDate(detail.salesDate)}</strong></div>
               <div className="daily-sales-detail-table-wrap">
                 <table className="daily-sales-detail-table">
                  <thead><tr><th>Variety</th><th>Sold Qty</th><th>Damaged Qty</th></tr></thead>
@@ -42,7 +42,7 @@ export default function DailySalesDetail({ open, detail, loading, error, onClose
             </>
           )}
         </div>
-        <footer className="daily-sales-modal-footer"><button className="daily-sales-secondary-button" type="button" onClick={onClose}>Tutup</button></footer>
+        <footer className="daily-sales-modal-footer"><button className="daily-sales-secondary-button" type="button" onClick={onClose}>Close</button></footer>
       </section>
     </div>
   );

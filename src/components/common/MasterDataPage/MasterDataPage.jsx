@@ -69,7 +69,7 @@ export default function MasterDataPage({
         value={searchTerm}
         onChange={setSearchTerm}
         placeholder={searchPlaceholder}
-        ariaLabel={`Cari ${title}`}
+        ariaLabel={`Search ${title}`}
       />
 
       {sortOptions.length > 0 && (
@@ -113,10 +113,10 @@ export default function MasterDataPage({
 
       <ConfirmDialog
         open={Boolean(deleteTarget)}
-        title={`Hapus ${formCopy.entityName}?`}
-        message={deleteTarget ? `${deleteTarget.name || deleteTarget.variety} tidak akan dihapus karena API backend belum tersedia.` : ""}
-        confirmText="Hapus"
-        cancelText="Batal"
+        title={`Delete ${formCopy.entityName}?`}
+        message={deleteTarget ? `${deleteTarget.name || deleteTarget.variety} will not be deleted because the backend API is not available yet.` : ""}
+        confirmText="Delete"
+        cancelText="Cancel"
         danger
         onConfirm={confirmDelete}
         onCancel={closeDelete}

@@ -74,7 +74,7 @@ export default function DailySales() {
         columns={columns}
         data={dailySales.tableRows}
         loading={dailySales.loading}
-        emptyMessage="Belum ada data daily sales."
+        emptyMessage="No daily sales data available."
         className="daily-sales-table-card table-card"
         rowKey={(row) => row.rowId}
       />

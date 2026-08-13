@@ -37,7 +37,7 @@ function isPositiveQuantity(value) {
 }
 
 function flowerLabel(item) {
-  return `${item.flower?.name || `Bunga #${item.flowerId}`}${
+  return `${item.flower?.name || `Flower #${item.flowerId}`}${
     item.flower?.variety ? ` · ${item.flower.variety}` : ""
   }`;
 }
@@ -87,7 +87,7 @@ export default function DistributionPlanning() {
         setError(
           getApiError(
             requestError,
-            "Detail distribution plan tidak dapat dimuat.",
+            "Unable to load distribution plan details.",
           ),
         );
       }
@@ -123,7 +123,7 @@ export default function DistributionPlanning() {
         setError(
           getApiError(
             requestError,
-            "Distribution planning tidak dapat dimuat.",
+            "Unable to load distribution planning.",
           ),
         );
       } finally {
@@ -157,7 +157,7 @@ export default function DistributionPlanning() {
       if (!groups.has(branchId)) {
         groups.set(branchId, {
           branchId,
-          branchName: item.branch?.name || `Cabang #${branchId}`,
+          branchName: item.branch?.name || `Branch #${branchId}`,
           items: [],
           hiddenItems: [],
           visibleItems: [],
@@ -195,7 +195,7 @@ export default function DistributionPlanning() {
       const input = inputs[item.id];
       if (!/^\d+(\.\d{1,2})?$/.test(input.finalQuantity.trim())) {
         setError(
-          "Jumlah akhir harus berupa angka nol atau positif dengan maksimal dua desimal.",
+          "Final quantity must be zero or a positive number with at most two decimal places.",
         );
         return false;
       }
@@ -206,7 +206,7 @@ export default function DistributionPlanning() {
         input.adjustmentReason.trim().length < 5
       ) {
         setError(
-          "Alasan penyesuaian minimal 5 karakter saat jumlah berbeda dari rekomendasi.",
+          "The adjustment reason must have at least 5 characters when the quantity differs from the recommendation.",
         );
         return false;
       }
@@ -226,11 +226,11 @@ export default function DistributionPlanning() {
         });
       }
       await openPlan(detail.id);
-      setSuccess("Perubahan quantity plan berhasil disimpan.");
+      setSuccess("Plan quantity changes saved successfully.");
       return true;
     } catch (requestError) {
       setError(
-        getApiError(requestError, "Perubahan plan tidak dapat disimpan."),
+        getApiError(requestError, "Unable to save plan changes."),
       );
       return false;
     } finally {
@@ -240,7 +240,7 @@ export default function DistributionPlanning() {
 
   const generatePlan = async () => {
     if (todayPlan) {
-      setSuccess("Plan untuk hari ini sudah ada. Generate plan dinonaktifkan.");
+      setSuccess("Today's plan already exists. Plan generation is disabled.");
       return;
     }
     setIsGenerating(true);
@@ -251,11 +251,11 @@ export default function DistributionPlanning() {
       await refresh({ selectOpenPlan: false });
       setSuccess(
         result.reused
-          ? "Plan untuk hari ini sudah ada, membuka plan yang tersedia."
-          : "Distribution plan DRAFT baru berhasil dibuat dari rekomendasi forecast.",
+          ? "Today's plan already exists. Opening the available plan."
+          : "A new DRAFT distribution plan was created from forecast recommendations.",
       );
     } catch (requestError) {
-      setError(getApiError(requestError, "Plan tidak dapat digenerate."));
+      setError(getApiError(requestError, "Unable to generate the plan."));
     } finally {
       setIsGenerating(false);
     }
@@ -265,7 +265,7 @@ export default function DistributionPlanning() {
     if (!detail) return;
     if (changedItems.length) {
       setError(
-        "Simpan semua perubahan quantity sebelum melanjutkan status plan.",
+        "Save all quantity changes before updating the plan status.",
       );
       return;
     }
@@ -274,7 +274,7 @@ export default function DistributionPlanning() {
     try {
       if (action === "finalize") {
         await distributionService.finalizePlan(detail.id);
-        setSuccess("Plan telah difinalisasi dan siap dibuatkan order.");
+        setSuccess("The plan was finalized and is ready to create orders.");
         await openPlan(detail.id);
       } else {
         await distributionService.createOrders(detail.id);
@@ -283,13 +283,13 @@ export default function DistributionPlanning() {
         setRevealedItems({});
         setAddingBranchId(null);
         setSuccess(
-          "Distribution order berhasil dibuat. Buka halaman Distribution untuk melihat riwayat dan Ship All.",
+          "Distribution orders were created. Open Distribution to review history and ship all orders.",
         );
       }
       await refresh({ selectOpenPlan: false });
     } catch (requestError) {
       setError(
-        getApiError(requestError, "Status plan tidak dapat diperbarui."),
+        getApiError(requestError, "Unable to update plan status."),
       );
     } finally {
       setIsTransitioning(false);
@@ -299,7 +299,7 @@ export default function DistributionPlanning() {
   const deleteActivePlan = async () => {
     if (!detail) return;
     const confirmed = window.confirm(
-      `Hapus Plan #${detail.id}? Plan yang sudah memiliki pengiriman berjalan tidak dapat dihapus.`,
+      `Delete Plan #${detail.id}? A plan with shipments in progress cannot be deleted.`,
     );
     if (!confirmed) return;
 
@@ -312,9 +312,9 @@ export default function DistributionPlanning() {
       setRevealedItems({});
       setAddingBranchId(null);
       await refresh({ selectOpenPlan: true });
-      setSuccess("Plan aktif berhasil dihapus.");
+      setSuccess("The active plan was deleted successfully.");
     } catch (requestError) {
-      setError(getApiError(requestError, "Plan aktif tidak dapat dihapus."));
+      setError(getApiError(requestError, "Unable to delete the active plan."));
     } finally {
       setIsDeleting(false);
     }
@@ -333,8 +333,8 @@ export default function DistributionPlanning() {
           <p className="distribution-planning-eyebrow">HEAD OFFICE PLANNING</p>
           <h1>Distribution Planning</h1>
           <p>
-            Gunakan forecast sebagai rekomendasi, lalu tetapkan jumlah kirim
-            akhir untuk setiap cabang.
+            Use the forecast as a recommendation, then set the final shipment
+            quantity for each branch.
           </p>
         </div>
         {canManage && (
@@ -350,9 +350,9 @@ export default function DistributionPlanning() {
             </button>
             {todayPlan && (
               <p>
-                Plan untuk hari ini sudah ada: Plan #{todayPlan.id} (
-                {statusLabel(todayPlan.status)}). Generate plan hanya bisa
-                sekali per hari.
+                Today's plan already exists: Plan #{todayPlan.id} (
+                {statusLabel(todayPlan.status)}). Plans can only be generated
+                once per day.
               </p>
             )}
           </div>
@@ -365,10 +365,10 @@ export default function DistributionPlanning() {
       <section className="distribution-plan-detail">
         <div className="distribution-section-heading">
           <div>
-            <h2>Plan aktif</h2>
+            <h2>Active Plan</h2>
             <p>
-              Review rekomendasi dan quantity final sebelum membuat distribution
-              order.
+              Review recommendations and final quantities before creating
+              distribution orders.
             </p>
           </div>
           {detail && (
@@ -381,19 +381,19 @@ export default function DistributionPlanning() {
         </div>
 
         {loading ? (
-          <div className="distribution-state">Memuat distribution plan...</div>
+          <div className="distribution-state">Loading distribution plan...</div>
         ) : !detail ? (
           <div className="distribution-state">
             {todayPlan
-              ? "Plan hari ini sudah ada dan tidak berada pada tahap edit. Buka halaman Distribution untuk melihat atau mengirim order."
-              : "Belum ada plan DRAFT atau FINALIZED. Generate plan baru untuk memulai."}
+              ? "Today's plan already exists and is not editable. Open Distribution to review or ship orders."
+              : "No DRAFT or FINALIZED plan is available. Generate a new plan to get started."}
           </div>
         ) : (
           <>
             <div className="distribution-plan-meta">
               <span>Plan #{detail.id}</span>
-              <span>Tanggal rencana: {formatDate(detail.planningDate)}</span>
-              <span>{detail.items.length} rekomendasi cabang-bunga tersedia</span>
+              <span>Planning date: {formatDate(detail.planningDate)}</span>
+              <span>{detail.items.length} branch-flower recommendations available</span>
             </div>
             <div className="distribution-branch-groups">
               {branchGroups.map((group) => (
@@ -402,9 +402,9 @@ export default function DistributionPlanning() {
                     <div>
                       <h3>{group.branchName}</h3>
                       <span>
-                        {group.visibleItems.length} bunga ditampilkan
+                         {group.visibleItems.length} flowers displayed
                         {group.hiddenItems.length
-                          ? ` · ${group.hiddenItems.length} belum ditambahkan`
+                           ? ` · ${group.hiddenItems.length} not added yet`
                           : ""}
                       </span>
                     </div>
@@ -421,15 +421,15 @@ export default function DistributionPlanning() {
                       >
                         <Plus size={15} />
                         {group.hiddenItems.length
-                          ? "Tambah bunga"
-                          : "Semua bunga sudah ditambahkan"}
+                           ? "Add Flower"
+                           : "All flowers added"}
                       </button>
                     )}
                   </div>
                   {addingBranchId === group.branchId && (
                     <div className="distribution-add-flower-panel">
                       <label htmlFor={`add-flower-${group.branchId}`}>
-                        Pilih bunga untuk {group.branchName}
+                         Select a flower for {group.branchName}
                       </label>
                       <select
                         id={`add-flower-${group.branchId}`}
@@ -437,11 +437,11 @@ export default function DistributionPlanning() {
                         onChange={(event) => revealFlower(event.target.value)}
                       >
                         <option value="" disabled>
-                          Pilih jenis bunga
+                           Select a flower type
                         </option>
                         {group.hiddenItems.map((item) => (
                           <option key={item.id} value={item.id}>
-                            {flowerLabel(item)} · Rekomendasi{" "}
+                             {flowerLabel(item)} · Recommended{" "}
                             {quantityText(item.recommendedQuantity)}
                           </option>
                         ))}
@@ -452,19 +452,18 @@ export default function DistributionPlanning() {
                     <table className="distribution-plan-table">
                       <thead>
                         <tr>
-                          <th>Bunga</th>
-                          <th>Rekomendasi forecast</th>
-                          <th>Jumlah final</th>
-                          <th>Alasan penyesuaian</th>
+                           <th>Flower</th>
+                           <th>Forecast Recommendation</th>
+                           <th>Final Quantity</th>
+                           <th>Adjustment Reason</th>
                         </tr>
                       </thead>
                       <tbody>
                         {!group.visibleItems.length && (
                           <tr>
                             <td colSpan={4} className="distribution-empty-row">
-                              Belum ada bunga yang ditampilkan untuk cabang ini.
-                              Gunakan tombol Tambah bunga jika ingin mengirim
-                              jenis bunga lain.
+                               No flowers are displayed for this branch. Use
+                               Add Flower to send another flower type.
                             </td>
                           </tr>
                         )}
@@ -480,7 +479,7 @@ export default function DistributionPlanning() {
                               <td>{quantityText(item.recommendedQuantity)}</td>
                               <td>
                                 <input
-                                  aria-label={`Jumlah final ${item.flower?.name || item.flowerId}`}
+                                   aria-label={`Final quantity for ${item.flower?.name || item.flowerId}`}
                                   disabled={!isDraft}
                                   inputMode="decimal"
                                   value={input.finalQuantity || ""}
@@ -495,7 +494,7 @@ export default function DistributionPlanning() {
                               </td>
                               <td>
                                 <input
-                                  aria-label={`Alasan penyesuaian ${item.flower?.name || item.flowerId}`}
+                                   aria-label={`Adjustment reason for ${item.flower?.name || item.flowerId}`}
                                   disabled={!isDraft || !changedFromRecommendation}
                                   value={input.adjustmentReason || ""}
                                   onChange={(event) =>
@@ -507,8 +506,8 @@ export default function DistributionPlanning() {
                                   }
                                   placeholder={
                                     changedFromRecommendation
-                                      ? "Wajib min. 5 karakter"
-                                      : "Tidak diperlukan"
+                                       ? "At least 5 characters required"
+                                       : "Not required"
                                   }
                                 />
                               </td>
@@ -529,7 +528,7 @@ export default function DistributionPlanning() {
                   onClick={deleteActivePlan}
                   disabled={isDeleting || isSaving || isTransitioning}
                 >
-                  <Trash2 size={17} /> {isDeleting ? "Menghapus..." : "Hapus Plan"}
+                  <Trash2 size={17} /> {isDeleting ? "Deleting..." : "Delete Plan"}
                 </button>
                 {detail.status === "DRAFT" && (
                   <>
@@ -539,7 +538,7 @@ export default function DistributionPlanning() {
                       onClick={saveChanges}
                       disabled={!changedItems.length || isSaving}
                     >
-                      {isSaving ? "Menyimpan..." : "Simpan perubahan"}
+                      {isSaving ? "Saving..." : "Save Changes"}
                     </button>
                     <button
                       className="distribution-primary-button"
@@ -559,7 +558,7 @@ export default function DistributionPlanning() {
                     disabled={isTransitioning}
                   >
                     <Plus size={17} />{" "}
-                    {isTransitioning ? "Membuat order..." : "Create Orders"}
+                     {isTransitioning ? "Creating orders..." : "Create Orders"}
                   </button>
                 )}
               </div>

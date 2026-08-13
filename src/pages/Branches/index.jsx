@@ -6,24 +6,24 @@ export default function Branches() {
       resource="branches"
       title="Branches"
       subtitle="Monitor operations across your branch network"
-      addLabel="Tambah Branch"
-      searchPlaceholder="Cari nama atau lokasi branch..."
-      emptyMessage="Belum ada branch yang tersedia."
+      addLabel="Add Branch"
+      searchPlaceholder="Search branch name or location..."
+      emptyMessage="No branches available."
       searchableFields={["name", "location"]}
       columns={[
-        { key: "name", label: "NAMA BRANCH" },
-        { key: "location", label: "LOKASI" },
+        { key: "name", label: "BRANCH NAME" },
+        { key: "location", label: "LOCATION" },
       ]}
       fields={[
-        { name: "name", label: "Nama Branch", required: true, placeholder: "Contoh: Cabang Jakarta" },
-        { name: "location", label: "Lokasi", required: true, placeholder: "Contoh: Jakarta Selatan" },
+        { name: "name", label: "Branch Name", required: true, placeholder: "Example: Jakarta Branch" },
+        { name: "location", label: "Location", required: true, placeholder: "Example: South Jakarta" },
       ]}
       formCopy={{
         entityName: "Branch",
-        createTitle: "Tambah Branch Baru",
-        createSubtitle: "Tambahkan branch ke jaringan BloomFlow",
+        createTitle: "Add New Branch",
+        createSubtitle: "Add a branch to the BloomFlow network",
         editTitle: "Edit Branch",
-        editSubtitle: "Perbarui informasi branch",
+        editSubtitle: "Update branch information",
       }}
     />
   );

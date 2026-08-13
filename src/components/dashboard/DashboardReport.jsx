@@ -27,6 +27,7 @@ export default function DashboardReport() {
     error,
     resourceErrors,
     refresh,
+    isBranchStaff,
     isHeadOffice,
     rangeDays,
     setRangeDays,
@@ -56,7 +57,7 @@ export default function DashboardReport() {
   }, [loading, period]);
 
   if (isRestoring) return null;
-  if (!user || !isHeadOffice) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/" replace />;
 
   const report = {
     period,
@@ -81,7 +82,7 @@ export default function DashboardReport() {
       </div>
       <header className="dashboard-report-header">
         <p className="eyebrow">BloomFlow Operations</p>
-        <h1>Head Office Report</h1>
+        <h1>{isBranchStaff ? "Branch Report" : isHeadOffice ? "Head Office Report" : "Super Admin Report"}</h1>
         <span className="dashboard-report-subtitle">
           {report.branchName || "All Branches"} · Period: {report.rangeDays} days ({formatDate(report.period?.dateFrom)} to {formatDate(report.period?.dateTo)})
         </span>
@@ -96,8 +97,8 @@ export default function DashboardReport() {
         summary={report.summary}
         resourceErrors={resourceErrors}
         onRetry={refresh}
-        isBranchStaff={false}
-        isHeadOffice
+        isBranchStaff={isBranchStaff}
+        isHeadOffice={isHeadOffice}
       />
       <div className="dashboard-chart-grid">
         <FlowerStatusPieChart data={report.flowerStatus} loading={loading} error={resourceErrors.branchInventory} onRetry={refresh} />
@@ -110,7 +111,7 @@ export default function DashboardReport() {
         onRetry={refresh}
         pagination={report.activitiesPagination}
         paginationDisabled={loading}
-        isHeadOffice
+        isHeadOffice={isHeadOffice}
       />
     </div>
   );
