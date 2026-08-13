@@ -107,10 +107,7 @@ export default function DistributionPlanning() {
         );
         setTodayPlan(existingTodayPlan || null);
         if (selectOpenPlan && existingTodayPlan) {
-          setDetail(null);
-          setInputs({});
-          setRevealedItems({});
-          setAddingBranchId(null);
+          await openPlan(existingTodayPlan.id);
           return;
         }
         if (selectOpenPlan) {
@@ -382,12 +379,12 @@ export default function DistributionPlanning() {
 
         {loading ? (
           <div className="distribution-state">Loading distribution plan...</div>
-        ) : !detail ? (
-          <div className="distribution-state">
-            {todayPlan
-              ? "Today's plan already exists and is not editable. Open Distribution to review or ship orders."
-              : "No DRAFT or FINALIZED plan is available. Generate a new plan to get started."}
-          </div>
+         ) : !detail ? (
+           <div className="distribution-state">
+             {todayPlan
+               ? "Today's plan already exists and is not editable. Finalize the plan, then create orders before opening Distribution to review or ship them."
+               : "No DRAFT or FINALIZED plan is available. Generate a new plan to get started."}
+           </div>
         ) : (
           <>
             <div className="distribution-plan-meta">
