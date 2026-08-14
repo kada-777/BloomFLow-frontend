@@ -34,10 +34,6 @@ function dateKey(value) {
   ].join("-");
 }
 
-function isPositiveQuantity(value) {
-  return Number.parseFloat(quantityText(value)) > 0;
-}
-
 function flowerLabel(item) {
   return `${item.flower?.name || `Flower #${item.flowerId}`}${
     item.flower?.variety ? ` · ${item.flower.variety}` : ""
@@ -49,8 +45,6 @@ export default function DistributionPlanning() {
   const canManage = user?.role?.toUpperCase() === "STAFF_HEAD_OFFICE";
   const [detail, setDetail] = useState(null);
   const [inputs, setInputs] = useState({});
-  const [revealedItems, setRevealedItems] = useState({});
-  const [addingBranchId, setAddingBranchId] = useState(null);
   const [todayPlan, setTodayPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -83,8 +77,6 @@ export default function DistributionPlanning() {
         const plan = await distributionService.getPlan(id);
         setDetail(plan);
         hydrateInputs(plan);
-        setRevealedItems({});
-        setAddingBranchId(null);
       } catch (requestError) {
         setError(
           getApiError(
@@ -160,25 +152,13 @@ export default function DistributionPlanning() {
           branchId,
           branchName: item.branch?.name || `Branch #${branchId}`,
           items: [],
-          hiddenItems: [],
-          visibleItems: [],
         });
       }
       const group = groups.get(branchId);
-      const isVisible =
-        isPositiveQuantity(item.recommendedQuantity) ||
-        isPositiveQuantity(item.finalQuantity) ||
-        Boolean(item.adjustmentReason) ||
-        Boolean(revealedItems[item.id]);
       group.items.push(item);
-      if (isVisible) {
-        group.visibleItems.push(item);
-      } else {
-        group.hiddenItems.push(item);
-      }
     }
     return [...groups.values()];
-  }, [detail, revealedItems]);
+  }, [detail]);
 
   const canShowPlanActions =
     canManage && detail && ["DRAFT", "FINALIZED"].includes(detail.status);
@@ -280,8 +260,6 @@ export default function DistributionPlanning() {
         await distributionService.createOrders(detail.id);
         setDetail(null);
         setInputs({});
-        setRevealedItems({});
-        setAddingBranchId(null);
         setSuccess(
           "Distribution orders were created. Open Distribution to review history and ship all orders.",
         );
@@ -309,8 +287,6 @@ export default function DistributionPlanning() {
       await distributionService.deletePlan(detail.id);
       setDetail(null);
       setInputs({});
-      setRevealedItems({});
-      setAddingBranchId(null);
       await refresh({ selectOpenPlan: true });
       setSuccess("The active plan was deleted successfully.");
     } catch (requestError) {
@@ -318,12 +294,6 @@ export default function DistributionPlanning() {
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const revealFlower = (itemId) => {
-    if (!itemId) return;
-    setRevealedItems((current) => ({ ...current, [itemId]: true }));
-    setAddingBranchId(null);
   };
 
   return (
@@ -401,53 +371,9 @@ export default function DistributionPlanning() {
                   <div className="distribution-branch-heading">
                     <div>
                       <h3>{group.branchName}</h3>
-                      <span>
-                         {group.visibleItems.length} flowers displayed
-                        {group.hiddenItems.length
-                           ? ` · ${group.hiddenItems.length} not added yet`
-                          : ""}
-                      </span>
+                      <span>{group.items.length} flowers displayed</span>
                     </div>
-                    {detail.status === "DRAFT" && canManage && (
-                      <button
-                        className="distribution-add-flower-button"
-                        type="button"
-                        onClick={() =>
-                          setAddingBranchId((current) =>
-                            current === group.branchId ? null : group.branchId,
-                          )
-                        }
-                        disabled={!group.hiddenItems.length}
-                      >
-                        <Plus size={15} />
-                        {group.hiddenItems.length
-                           ? "Add Flower"
-                           : "All flowers added"}
-                      </button>
-                    )}
                   </div>
-                  {addingBranchId === group.branchId && (
-                    <div className="distribution-add-flower-panel">
-                      <label htmlFor={`add-flower-${group.branchId}`}>
-                         Select a flower for {group.branchName}
-                      </label>
-                      <select
-                        id={`add-flower-${group.branchId}`}
-                        defaultValue=""
-                        onChange={(event) => revealFlower(event.target.value)}
-                      >
-                        <option value="" disabled>
-                           Select a flower type
-                        </option>
-                        {group.hiddenItems.map((item) => (
-                          <option key={item.id} value={item.id}>
-                             {flowerLabel(item)} · Recommended{" "}
-                            {quantityText(item.recommendedQuantity)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
                   <div className="distribution-table-wrap">
                     <table className="distribution-plan-table">
                       <thead>
@@ -459,15 +385,14 @@ export default function DistributionPlanning() {
                         </tr>
                       </thead>
                       <tbody>
-                        {!group.visibleItems.length && (
+                        {!group.items.length && (
                           <tr>
                             <td colSpan={4} className="distribution-empty-row">
-                               No flowers are displayed for this branch. Use
-                               Add Flower to send another flower type.
+                              No flowers are available for this branch.
                             </td>
                           </tr>
                         )}
-                        {group.visibleItems.map((item) => {
+                        {group.items.map((item) => {
                           const input = inputs[item.id] || {};
                           const isDraft = detail.status === "DRAFT" && canManage;
                           const changedFromRecommendation =

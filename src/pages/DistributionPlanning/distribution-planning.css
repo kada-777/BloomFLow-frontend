@@ -24,12 +24,6 @@
 .distribution-branch-heading { align-items: center; display: flex; gap: 12px; justify-content: space-between; margin-bottom: 10px; }
 .distribution-branch-heading h3 { color: var(--text); font-size: 15px; margin: 0; }
 .distribution-branch-heading span { color: var(--muted); display: block; font-size: 12px; font-weight: 800; margin-top: 4px; }
-.distribution-add-flower-button { align-items: center; background: transparent; border: 1px dashed var(--accent); border-radius: 10px; color: var(--accent); display: inline-flex; font-size: 12px; font-weight: 800; gap: 7px; min-height: 34px; padding: 0 12px; white-space: nowrap; }
-.distribution-add-flower-button:disabled { border-color: var(--border); color: var(--muted); cursor: not-allowed; opacity: .75; }
-.distribution-add-flower-panel { align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 11px; display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 12px; padding: 12px; }
-.distribution-add-flower-panel label { color: var(--muted); font-size: 12px; font-weight: 800; }
-.distribution-add-flower-panel select { background: var(--bg); border: 1px solid var(--border); border-radius: 9px; color: var(--text); min-height: 36px; min-width: 240px; padding: 0 10px; }
-.distribution-add-flower-panel select:focus { border-color: var(--accent); outline: none; }
 .distribution-plan-table { border-collapse: collapse; min-width: 720px; width: 100%; }
 .distribution-plan-table th { color: var(--muted); font-size: 11px; letter-spacing: .05em; padding: 11px 10px; text-align: left; }
 .distribution-plan-table td { border-top: 1px solid var(--border); color: var(--text); font-size: 13px; padding: 11px 10px; }
