@@ -14,7 +14,9 @@ function formatDate(value) {
 }
 
 function quantityText(value) {
-  return value === null || value === undefined ? "0" : String(value);
+  if (value === null || value === undefined || value === "") return "0";
+  const quantity = Number(value);
+  return Number.isFinite(quantity) ? String(Math.round(quantity)) : "0";
 }
 
 function statusLabel(status) {
@@ -138,10 +140,12 @@ export default function DistributionPlanning() {
     () =>
       (detail?.items || []).filter((item) => {
         const input = inputs[item.id];
+        const finalQuantity = input?.finalQuantity?.trim() || "";
         return (
           input &&
-          quantityText(item.finalQuantity ?? item.recommendedQuantity) !==
-            input.finalQuantity.trim()
+          (!/^\d+$/.test(finalQuantity) ||
+            quantityText(item.finalQuantity ?? item.recommendedQuantity) !==
+              quantityText(finalQuantity))
         );
       }),
     [detail, inputs],
@@ -190,14 +194,13 @@ export default function DistributionPlanning() {
     if (!detail || !changedItems.length) return true;
     for (const item of changedItems) {
       const input = inputs[item.id];
-      if (!/^\d+(\.\d{1,2})?$/.test(input.finalQuantity.trim())) {
-        setError(
-          "Final quantity must be zero or a positive number with at most two decimal places.",
-        );
+      if (!/^\d+$/.test(input.finalQuantity.trim())) {
+        setError("Final quantity must be a non-negative integer.");
         return false;
       }
       const changedFromRecommendation =
-        quantityText(item.recommendedQuantity) !== input.finalQuantity.trim();
+        quantityText(item.recommendedQuantity) !==
+        quantityText(input.finalQuantity.trim());
       if (
         changedFromRecommendation &&
         input.adjustmentReason.trim().length < 5
@@ -215,9 +218,9 @@ export default function DistributionPlanning() {
       for (const item of changedItems) {
         const input = inputs[item.id];
         await distributionService.updatePlanItem(detail.id, item.id, {
-          finalQuantity: input.finalQuantity.trim(),
+          finalQuantity: quantityText(input.finalQuantity.trim()),
           ...(quantityText(item.recommendedQuantity) !==
-          input.finalQuantity.trim()
+          quantityText(input.finalQuantity.trim())
             ? { adjustmentReason: input.adjustmentReason.trim() }
             : {}),
         });
@@ -468,7 +471,7 @@ export default function DistributionPlanning() {
                           const input = inputs[item.id] || {};
                           const isDraft = detail.status === "DRAFT" && canManage;
                           const changedFromRecommendation =
-                            input.finalQuantity !==
+                            quantityText(input.finalQuantity) !==
                             quantityText(item.recommendedQuantity);
                           return (
                             <tr key={item.id}>
@@ -476,9 +479,11 @@ export default function DistributionPlanning() {
                               <td>{quantityText(item.recommendedQuantity)}</td>
                               <td>
                                 <input
-                                   aria-label={`Final quantity for ${item.flower?.name || item.flowerId}`}
+                                  aria-label={`Final quantity for ${item.flower?.name || item.flowerId}`}
                                   disabled={!isDraft}
-                                  inputMode="decimal"
+                                  type="text"
+                                  inputMode="numeric"
+                                  pattern="[0-9]*"
                                   value={input.finalQuantity || ""}
                                   onChange={(event) =>
                                     updateInput(
