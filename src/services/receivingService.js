@@ -12,8 +12,10 @@ function unwrapPaginated(response) {
 }
 
 export const receivingService = {
-  async list({ page = 1, limit = 10 } = {}) {
-    return unwrapPaginated(await api.get("/receivings", { params: { page, limit } }));
+  async list({ page = 1, limit = 10, receivedDate = "" } = {}) {
+    return unwrapPaginated(await api.get("/receivings", {
+      params: { page, limit, ...(receivedDate ? { receivedDate } : {}) },
+    }));
   },
 
   async getById(id) {

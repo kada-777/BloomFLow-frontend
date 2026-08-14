@@ -101,7 +101,7 @@ export default function useReceiving() {
     setLoading(true);
     setError("");
     const results = await Promise.allSettled([
-      receivingService.list({ page, limit: 10 }),
+      receivingService.list({ page, limit: 10, receivedDate: selectedDate }),
       receivingService.listFarms(),
       receivingService.listFlowers(),
     ]);
@@ -117,7 +117,7 @@ export default function useReceiving() {
     if (flowerResult.status === "fulfilled") setFlowers(normalizeList(flowerResult.value));
     else setError((current) => current || getApiError(flowerResult.reason, "Unable to load flowers."));
     setLoading(false);
-  }, [page]);
+  }, [page, selectedDate]);
 
   useEffect(() => {
     refresh();
