@@ -21,6 +21,9 @@
 .distribution-secondary-button { background: transparent; border: 1px solid var(--border); color: var(--text); }
 .distribution-primary-button:disabled, .distribution-secondary-button:disabled { cursor: not-allowed; opacity: .6; }
 .distribution-row-actions { align-items: center; display: inline-flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.distribution-plan-action-row td { background: color-mix(in srgb, var(--accent) 5%, var(--card)); border-top: 0; padding: 8px 10px 14px; text-align: left !important; }
+.distribution-plan-action-content { align-items: center; display: flex; gap: 12px; justify-content: space-between; }
+.distribution-plan-action-content span { color: var(--muted); font-size: 12px; font-weight: 700; }
 .distribution-pagination { align-items: center; color: var(--muted); display: flex; font-size: 13px; gap: 12px; justify-content: flex-end; margin-top: 16px; }
 .distribution-state { color: var(--muted); padding: 28px 0 8px; text-align: center; }
 .distribution-detail-backdrop { background: rgba(20, 24, 31, .34); display: flex; inset: 0; justify-content: flex-end; position: fixed; z-index: 30; }
@@ -32,4 +35,4 @@
 .distribution-detail-meta span:not(.distribution-status) { background: var(--bg); border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font-size: 12px; font-weight: 700; padding: 6px 10px; }
 .distribution-detail-section { margin-top: 20px; }
 .distribution-detail-section h3 { font-size: 15px; margin-bottom: 10px; }
-@media (max-width: 720px) { .distribution-page { padding: 22px 16px; }.distribution-header { align-items: stretch; flex-direction: column; }.distribution-pagination { justify-content: space-between; }.distribution-row-actions { justify-content: flex-start; } }
+@media (max-width: 720px) { .distribution-page { padding: 22px 16px; }.distribution-header { align-items: stretch; flex-direction: column; }.distribution-pagination { justify-content: space-between; }.distribution-row-actions { justify-content: flex-start; }.distribution-plan-action-content { align-items: stretch; flex-direction: column; } }

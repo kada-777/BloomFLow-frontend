@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Eye, PackageCheck, X, XCircle } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
@@ -256,42 +256,52 @@ export default function Distribution() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order) => {
-                    const isFirstDraftPlanOrder =
-                      order.distributionPlanId &&
-                      firstDraftOrderByPlan.get(order.distributionPlanId) === order.id;
+                  {orders.map((order, orderIndex) => {
+                    const isLastOrderInPlan = order.distributionPlanId && !orders
+                      .slice(orderIndex + 1)
+                      .some((nextOrder) => nextOrder.distributionPlanId === order.distributionPlanId);
+
                     return (
-                      <tr key={order.id}>
-                        <td>Order #{order.id}</td>
-                        <td>{order.distributionPlanId ? `Plan #${order.distributionPlanId}` : "-"}</td>
-                        <td>{order.branch?.name || `Branch #${order.branchId}`}</td>
-                        <td>
-                          <span className={`distribution-status status-${order.status.toLowerCase()}`}>
-                            {statusLabel(order.status)}
-                          </span>
-                        </td>
-                        <td>{formatDate(order.shippedAt)}</td>
-                        <td>
-                          <div className="distribution-row-actions">
-                            <button type="button" className="distribution-secondary-button" onClick={() => openDetail(order.id)}>
-                              <Eye size={15} /> Detail
-                            </button>
-                            {canShip && isFirstDraftPlanOrder && (
-                              <button
-                                type="button"
-                                className="distribution-primary-button"
-                                onClick={() => shipPlan(order.distributionPlanId)}
-                                disabled={shippingPlanId === order.distributionPlanId}
-                              >
-                                <PackageCheck size={15} />
-                                {shippingPlanId === order.distributionPlanId
-                                  ? "Shipping..."
-                                  : `Ship All Plan #${order.distributionPlanId}`}
+                      <Fragment key={order.id}>
+                        <tr>
+                          <td>Order #{order.id}</td>
+                          <td>{order.distributionPlanId ? `Plan #${order.distributionPlanId}` : "-"}</td>
+                          <td>{order.branch?.name || `Branch #${order.branchId}`}</td>
+                          <td>
+                            <span className={`distribution-status status-${order.status.toLowerCase()}`}>
+                              {statusLabel(order.status)}
+                            </span>
+                          </td>
+                          <td>{formatDate(order.shippedAt)}</td>
+                          <td>
+                            <div className="distribution-row-actions">
+                              <button type="button" className="distribution-secondary-button" onClick={() => openDetail(order.id)}>
+                                <Eye size={15} /> Detail
                               </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
+                            </div>
+                          </td>
+                        </tr>
+                        {canShip && isLastOrderInPlan && order.distributionPlanId && firstDraftOrderByPlan.has(order.distributionPlanId) && (
+                          <tr className="distribution-plan-action-row">
+                            <td colSpan={6}>
+                              <div className="distribution-plan-action-content">
+                                <span>Ready to ship all orders in Plan #{order.distributionPlanId}</span>
+                                <button
+                                  type="button"
+                                  className="distribution-primary-button"
+                                  onClick={() => shipPlan(order.distributionPlanId)}
+                                  disabled={shippingPlanId === order.distributionPlanId}
+                                >
+                                  <PackageCheck size={15} />
+                                  {shippingPlanId === order.distributionPlanId
+                                    ? "Shipping..."
+                                    : `Ship All Plan #${order.distributionPlanId}`}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
                     );
                   })}
                 </tbody>
