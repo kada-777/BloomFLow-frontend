@@ -28,7 +28,7 @@
 
 - [ ] **Step 1: Remove the feature-only icon and state**
 
-Remove the `Plus` import and delete these state values:
+Keep the `Plus` import because it is still used by the existing `Create Orders` action. Delete these state values:
 
 ```js
 const [revealedItems, setRevealedItems] = useState({});
