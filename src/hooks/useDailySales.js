@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getApiError } from "../services/api";
 import { dailySalesService } from "../services/dailySalesService";
+import { normalizeIntegerQuantity } from "../utils/quantity";
 
 export const emptyDailySalesItem = () => ({
   flowerId: "",
@@ -26,8 +27,11 @@ function normalizeList(value) {
   return [];
 }
 
-function decimal(value) {
-  return /^\d+(\.\d{1,2})?$/.test(String(value).trim()) ? Number(value) : null;
+function normalizeDailySalesQuantity(value) {
+  const normalized = String(value ?? "").trim();
+  return /^\d+(\.\d{1,2})?$/.test(normalized)
+    ? normalizeIntegerQuantity(normalized)
+    : null;
 }
 
 function getDailySalesError(error, fallback) {
@@ -53,16 +57,17 @@ export function validateDailySalesForm(payload) {
   items.forEach((item, index) => {
     const prefix = `items.${index}`;
     const flowerId = String(item.flowerId || "");
-    const soldQuantity = decimal(item.soldQuantity);
-    const damagedQuantity = decimal(item.damagedQuantity);
+    const soldQuantity = normalizeDailySalesQuantity(item.soldQuantity);
+    const damagedQuantity = normalizeDailySalesQuantity(item.damagedQuantity);
 
     if (!flowerId) errors[`${prefix}.flowerId`] = "A flower must be selected.";
     if (flowerId && flowerIds.has(flowerId)) errors[`${prefix}.flowerId`] = "Flowers cannot be duplicated.";
     if (flowerId) flowerIds.add(flowerId);
 
-    if (soldQuantity === null) errors[`${prefix}.soldQuantity`] = "Enter a valid decimal number.";
-    if (damagedQuantity === null) errors[`${prefix}.damagedQuantity`] = "Enter a valid decimal number.";
-    if (soldQuantity !== null && damagedQuantity !== null && soldQuantity + damagedQuantity <= 0) {
+    if (soldQuantity === null) errors[`${prefix}.soldQuantity`] = "Enter a valid non-negative quantity.";
+    if (damagedQuantity === null) errors[`${prefix}.damagedQuantity`] = "Enter a valid non-negative quantity.";
+    if (soldQuantity !== null && damagedQuantity !== null
+      && Number(soldQuantity) + Number(damagedQuantity) <= 0) {
       errors[`${prefix}.soldQuantity`] = "Sold and damaged quantities must total more than zero.";
     }
   });
@@ -75,9 +80,24 @@ function normalizePayload(payload) {
     salesDate: payload.salesDate,
     items: payload.items.map((item) => ({
       flowerId: Number(item.flowerId),
-      soldQuantity: String(item.soldQuantity).trim(),
-      damagedQuantity: String(item.damagedQuantity).trim(),
+      soldQuantity: normalizeIntegerQuantity(item.soldQuantity),
+      damagedQuantity: normalizeIntegerQuantity(item.damagedQuantity),
     })),
+  };
+}
+
+function normalizeQuantityFields(payload) {
+  return {
+    ...payload,
+    items: payload.items.map((item) => {
+      const soldQuantity = normalizeDailySalesQuantity(item.soldQuantity);
+      const damagedQuantity = normalizeDailySalesQuantity(item.damagedQuantity);
+      return {
+        ...item,
+        soldQuantity: soldQuantity === null ? item.soldQuantity : soldQuantity,
+        damagedQuantity: damagedQuantity === null ? item.damagedQuantity : damagedQuantity,
+      };
+    }),
   };
 }
 
@@ -192,7 +212,8 @@ export default function useDailySales() {
   };
 
   const submitCreate = async (payload) => {
-    const validationErrors = validateDailySalesForm(payload);
+    const normalizedPayload = normalizeQuantityFields(payload);
+    const validationErrors = validateDailySalesForm(normalizedPayload);
     if (Object.keys(validationErrors).length) {
       setFormError("Review the invalid Daily Sales fields.");
       return { errors: validationErrors };
@@ -201,7 +222,7 @@ export default function useDailySales() {
     setSubmitting(true);
     setFormError("");
     try {
-      await dailySalesService.create(normalizePayload(payload));
+      await dailySalesService.create(normalizePayload(normalizedPayload));
       setFormOpen(false);
       setSuccessMessage("Daily Sales saved successfully.");
       await refresh();

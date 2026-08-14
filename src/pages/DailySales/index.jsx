@@ -4,6 +4,7 @@ import Pagination from "../../components/common/Pagination/Pagination";
 import DailySalesDetail from "../../components/daily-sales/DailySalesDetail";
 import DailySalesForm from "../../components/daily-sales/DailySalesForm";
 import useDailySales, { emptyDailySalesItem } from "../../hooks/useDailySales";
+import { normalizeIntegerQuantity } from "../../utils/quantity";
 import "./daily-sales.css";
 
 function formatDate(value) {
@@ -12,7 +13,7 @@ function formatDate(value) {
 }
 
 function formatQuantity(value) {
-  return Number(value).toLocaleString("id-ID", { maximumFractionDigits: 2 });
+  return Number(normalizeIntegerQuantity(value)).toLocaleString("id-ID");
 }
 
 export default function DailySales() {

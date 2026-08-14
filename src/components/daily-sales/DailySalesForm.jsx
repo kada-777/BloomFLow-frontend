@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Plus, Save, Trash2, X } from "lucide-react";
+import { normalizeIntegerQuantity } from "../../utils/quantity";
 
 function fieldError(errors, index, field) {
   return errors[`items.${index}.${field}`];
@@ -34,6 +35,10 @@ export default function DailySalesForm({
   const updateItem = (index, field, value) => {
     onChange(index, field, value);
     setFieldErrors((current) => ({ ...current, [`items.${index}.${field}`]: "" }));
+  };
+
+  const normalizeQuantityField = (index, field, value) => {
+    updateItem(index, field, normalizeIntegerQuantity(value));
   };
 
   return (
@@ -96,12 +101,12 @@ export default function DailySalesForm({
                   </label>
                   <label className="daily-sales-field">
                     <span>Sold Qty</span>
-                    <input type="number" min="0" step="0.01" value={item.soldQuantity} onChange={(event) => updateItem(index, "soldQuantity", event.target.value)} disabled={submitting} />
+                    <input type="number" min="0" step="1" value={item.soldQuantity} onChange={(event) => updateItem(index, "soldQuantity", event.target.value)} onBlur={(event) => normalizeQuantityField(index, "soldQuantity", event.target.value)} disabled={submitting} />
                     {fieldError(fieldErrors, index, "soldQuantity") && <em>{fieldError(fieldErrors, index, "soldQuantity")}</em>}
                   </label>
                   <label className="daily-sales-field">
                     <span>Damaged Qty</span>
-                    <input type="number" min="0" step="0.01" value={item.damagedQuantity} onChange={(event) => updateItem(index, "damagedQuantity", event.target.value)} disabled={submitting} />
+                    <input type="number" min="0" step="1" value={item.damagedQuantity} onChange={(event) => updateItem(index, "damagedQuantity", event.target.value)} onBlur={(event) => normalizeQuantityField(index, "damagedQuantity", event.target.value)} disabled={submitting} />
                     {fieldError(fieldErrors, index, "damagedQuantity") && <em>{fieldError(fieldErrors, index, "damagedQuantity")}</em>}
                   </label>
                 </div>
