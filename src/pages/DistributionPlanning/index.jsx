@@ -4,6 +4,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
 import { getApiError } from "../../services/api";
 import { distributionService } from "../../services/distributionService";
+import GeneratePlanDialog from "./GeneratePlanDialog";
+import { formatPlanningDate } from "./planningDate";
 import "./distribution-planning.css";
 
 function formatDate(value) {
@@ -23,17 +25,6 @@ function statusLabel(status) {
   return status?.replaceAll("_", " ") || "-";
 }
 
-function dateKey(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-");
-}
-
 function flowerLabel(item) {
   return `${item.flower?.name || `Flower #${item.flowerId}`}${
     item.flower?.variety ? ` · ${item.flower.variety}` : ""
@@ -45,7 +36,11 @@ export default function DistributionPlanning() {
   const canManage = user?.role?.toUpperCase() === "STAFF_HEAD_OFFICE";
   const [detail, setDetail] = useState(null);
   const [inputs, setInputs] = useState({});
-  const [todayPlan, setTodayPlan] = useState(null);
+  const [planningMetadata, setPlanningMetadata] = useState(null);
+  const [selectedPlanningDate, setSelectedPlanningDate] = useState("");
+  const [metadataLoading, setMetadataLoading] = useState(true);
+  const [metadataError, setMetadataError] = useState("");
+  const [generationDialog, setGenerationDialog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -89,21 +84,37 @@ export default function DistributionPlanning() {
     [hydrateInputs],
   );
 
+  const loadPlanningMetadata = useCallback(async () => {
+    setMetadataLoading(true);
+    setMetadataError("");
+    try {
+      const metadata = await distributionService.getPlanningMetadata();
+      const planningDates = Array.isArray(metadata?.planningDates)
+        ? metadata.planningDates
+        : [];
+      const firstAvailable = planningDates.find((entry) => entry.available);
+
+      setPlanningMetadata({ ...metadata, planningDates });
+      setSelectedPlanningDate(firstAvailable?.date || "");
+      return metadata;
+    } catch (requestError) {
+      setPlanningMetadata(null);
+      setSelectedPlanningDate("");
+      setMetadataError(
+        getApiError(requestError, "Unable to load planning dates."),
+      );
+      return null;
+    } finally {
+      setMetadataLoading(false);
+    }
+  }, []);
+
   const refresh = useCallback(
     async ({ selectOpenPlan = true } = {}) => {
       setLoading(true);
       setError("");
       try {
         const planRows = await distributionService.listPlans();
-        const currentDateKey = dateKey(new Date());
-        const existingTodayPlan = (planRows || []).find(
-          (plan) => dateKey(plan.planningDate) === currentDateKey,
-        );
-        setTodayPlan(existingTodayPlan || null);
-        if (selectOpenPlan && existingTodayPlan) {
-          await openPlan(existingTodayPlan.id);
-          return;
-        }
         if (selectOpenPlan) {
           const open = (planRows || []).find((plan) =>
             ["DRAFT", "FINALIZED"].includes(plan.status),
@@ -126,7 +137,8 @@ export default function DistributionPlanning() {
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+    loadPlanningMetadata();
+  }, [loadPlanningMetadata, refresh]);
 
   const changedItems = useMemo(
     () =>
@@ -162,6 +174,16 @@ export default function DistributionPlanning() {
 
   const canShowPlanActions =
     canManage && detail && ["DRAFT", "FINALIZED"].includes(detail.status);
+  const selectedPlanningEntry = planningMetadata?.planningDates.find(
+    (entry) => entry.date === selectedPlanningDate && entry.available,
+  );
+  const hasAvailablePlanningDate = Boolean(selectedPlanningEntry);
+  const planningUnavailableMessage =
+    planningMetadata?.unavailableReason === "SALES_DATA_OUTDATED"
+      ? "Tidak ada tanggal planning yang tersedia. Data Daily Sales perlu diperbarui sebelum membuat plan baru."
+      : planningMetadata && !hasAvailablePlanningDate
+        ? "Semua tanggal planning yang tersedia sudah memiliki plan."
+        : "";
 
   const updateInput = (itemId, field, value) => {
     setInputs((current) => ({
@@ -218,24 +240,50 @@ export default function DistributionPlanning() {
     }
   };
 
+  const openGenerationDialog = () => {
+    if (!selectedPlanningEntry || isGenerating) return;
+    setGenerationDialog({
+      planningDate: selectedPlanningEntry.date,
+      cutoffDate: planningMetadata.cutoffDate,
+      horizon: selectedPlanningEntry.horizon,
+    });
+  };
+
+  const closeGenerationDialog = () => {
+    if (!isGenerating) setGenerationDialog(null);
+  };
+
   const generatePlan = async () => {
-    if (todayPlan) {
-      setSuccess("Today's plan already exists. Plan generation is disabled.");
-      return;
-    }
+    if (!generationDialog || isGenerating) return;
+
     setIsGenerating(true);
     setError("");
     try {
-      const result = await distributionService.generatePlan();
+      const result = await distributionService.generatePlan(
+        generationDialog.planningDate,
+      );
       await openPlan(result.distributionPlanId);
-      await refresh({ selectOpenPlan: false });
+      await Promise.all([
+        refresh({ selectOpenPlan: false }),
+        loadPlanningMetadata(),
+      ]);
+      setGenerationDialog(null);
       setSuccess(
-        result.reused
-          ? "Today's plan already exists. Opening the available plan."
-          : "A new DRAFT distribution plan was created from forecast recommendations.",
+        "A new DRAFT distribution plan was created from forecast recommendations.",
       );
     } catch (requestError) {
-      setError(getApiError(requestError, "Unable to generate the plan."));
+      if (requestError.response?.status === 409) {
+        setGenerationDialog(null);
+        await loadPlanningMetadata();
+        setError(
+          getApiError(
+            requestError,
+            "Planning metadata has changed. Choose an available date and try again.",
+          ),
+        );
+      } else {
+        setError(getApiError(requestError, "Unable to generate the plan."));
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -309,27 +357,54 @@ export default function DistributionPlanning() {
         </div>
         {canManage && (
           <div className="distribution-generate-area">
+            <label className="distribution-planning-date-field">
+              <span>Planning Date</span>
+              <select
+                value={selectedPlanningDate}
+                onChange={(event) => setSelectedPlanningDate(event.target.value)}
+                disabled={metadataLoading || isGenerating}
+              >
+                {!selectedPlanningDate && (
+                  <option value="">Pilih tanggal planning</option>
+                )}
+                {(planningMetadata?.planningDates || []).map((entry) => (
+                  <option
+                    key={entry.date}
+                    value={entry.date}
+                    disabled={!entry.available}
+                  >
+                    {formatPlanningDate(entry.date)}
+                    {entry.reason === "PLAN_ALREADY_EXISTS"
+                      ? " - Plan sudah ada"
+                      : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button
               className="distribution-primary-button"
               type="button"
-              onClick={generatePlan}
-              disabled={isGenerating || Boolean(todayPlan)}
+              onClick={openGenerationDialog}
+              disabled={
+                metadataLoading || isGenerating || !hasAvailablePlanningDate
+              }
             >
-              <Sparkles size={18} />{" "}
-              {isGenerating ? "Generating..." : "Generate Plan"}
+              <Sparkles size={18} /> Generate Plan
             </button>
-            {todayPlan && (
-              <p>
-                Today's plan already exists: Plan #{todayPlan.id} (
-                {statusLabel(todayPlan.status)}). Plans can only be generated
-                once per day.
-              </p>
+            {metadataLoading && <p>Memuat tanggal planning...</p>}
+            {!metadataLoading && planningUnavailableMessage && (
+              <p>{planningUnavailableMessage}</p>
             )}
           </div>
         )}
       </header>
 
       <ActionNotice message={error} tone="error" onAction={() => refresh()} />
+      <ActionNotice
+        message={metadataError}
+        tone="error"
+        onAction={loadPlanningMetadata}
+      />
       <ActionNotice message={success} onClose={() => setSuccess("")} />
 
       <section className="distribution-plan-detail">
@@ -354,9 +429,8 @@ export default function DistributionPlanning() {
           <div className="distribution-state">Loading distribution plan...</div>
          ) : !detail ? (
            <div className="distribution-state">
-             {todayPlan
-               ? "Today's plan already exists and is not editable. Finalize the plan, then create orders before opening Distribution to review or ship them."
-               : "No DRAFT or FINALIZED plan is available. Generate a new plan to get started."}
+             No DRAFT or FINALIZED plan is available. Generate a new plan to get
+             started.
            </div>
         ) : (
           <>
@@ -494,6 +568,15 @@ export default function DistributionPlanning() {
         )}
       </section>
 
+      <GeneratePlanDialog
+        open={Boolean(generationDialog)}
+        planningDate={generationDialog?.planningDate}
+        cutoffDate={generationDialog?.cutoffDate}
+        horizon={generationDialog?.horizon}
+        submitting={isGenerating}
+        onCancel={closeGenerationDialog}
+        onConfirm={generatePlan}
+      />
     </div>
   );
 }

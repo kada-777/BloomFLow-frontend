@@ -12,6 +12,10 @@
 .distribution-primary-button:disabled, .distribution-secondary-button:disabled, .distribution-danger-button:disabled { cursor: not-allowed; opacity: .6; }
 .distribution-generate-area { align-items: flex-end; display: flex; flex-direction: column; gap: 8px; max-width: 340px; }
 .distribution-generate-area p { color: var(--muted); font-size: 12px; line-height: 1.45; margin: 0; text-align: right; }
+.distribution-planning-date-field { display: grid; gap: 6px; min-width: 230px; }
+.distribution-planning-date-field span { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.distribution-planning-date-field select { background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--text); min-height: 42px; padding: 0 34px 0 12px; }
+.distribution-planning-date-field select:focus { border-color: var(--accent); outline: none; }
 .distribution-plan-detail { background: var(--card); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); margin-top: 18px; padding: 20px; }
 .distribution-section-heading h2 { font-size: 18px; }
 .distribution-section-heading p { font-size: 13px; }
@@ -33,4 +37,4 @@
 .distribution-plan-table input:focus { border-color: var(--accent); outline: none; }
 .distribution-plan-actions { align-items: center; justify-content: flex-end; margin-top: 18px; }
 .distribution-state { color: var(--muted); padding: 28px 0 8px; text-align: center; }
-@media (max-width: 720px) { .distribution-planning-page { padding: 22px 16px; }.distribution-planning-header { align-items: stretch; flex-direction: column; }.distribution-primary-button { justify-content: center; }.distribution-generate-area { align-items: stretch; max-width: none; }.distribution-generate-area p { text-align: left; }.distribution-section-heading { flex-direction: column; }.distribution-plan-actions { align-items: stretch; flex-direction: column; }.distribution-plan-actions button { justify-content: center; } }
+@media (max-width: 720px) { .distribution-planning-page { padding: 22px 16px; }.distribution-planning-header { align-items: stretch; flex-direction: column; }.distribution-primary-button { justify-content: center; }.distribution-generate-area { align-items: stretch; max-width: none; }.distribution-generate-area p { text-align: left; }.distribution-planning-date-field { min-width: 0; }.distribution-section-heading { flex-direction: column; }.distribution-plan-actions { align-items: stretch; flex-direction: column; }.distribution-plan-actions button { justify-content: center; } }
