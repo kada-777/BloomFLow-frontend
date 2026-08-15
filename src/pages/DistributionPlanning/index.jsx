@@ -183,6 +183,7 @@ export default function DistributionPlanning() {
 
   const canShowPlanActions =
     canManage && detail && ["DRAFT", "FINALIZED"].includes(detail.status);
+  const isPlanMutationActive = isSaving || isTransitioning || isDeleting;
   const selectedPlanningEntry = planningMetadata?.planningDates.find(
     (entry) => entry.date === selectedPlanningDate && entry.available,
   );
@@ -202,6 +203,7 @@ export default function DistributionPlanning() {
   };
 
   const saveChanges = async () => {
+    if (isGenerating) return false;
     if (!detail || !changedItems.length) return true;
     for (const item of changedItems) {
       const input = inputs[item.id];
@@ -250,7 +252,7 @@ export default function DistributionPlanning() {
   };
 
   const openGenerationDialog = () => {
-    if (!selectedPlanningEntry || isGenerating) return;
+    if (!selectedPlanningEntry || isGenerating || isPlanMutationActive) return;
     setGenerationDialog({
       planningDate: selectedPlanningEntry.date,
       cutoffDate: planningMetadata.cutoffDate,
@@ -263,7 +265,7 @@ export default function DistributionPlanning() {
   };
 
   const generatePlan = async () => {
-    if (!generationDialog || isGenerating) return;
+    if (!generationDialog || isGenerating || isPlanMutationActive) return;
 
     setIsGenerating(true);
     setError("");
@@ -304,7 +306,7 @@ export default function DistributionPlanning() {
   };
 
   const transitionPlan = async (action) => {
-    if (!detail) return;
+    if (!detail || isGenerating) return;
     if (changedItems.length) {
       setError(
         "Save all quantity changes before updating the plan status.",
@@ -337,7 +339,7 @@ export default function DistributionPlanning() {
   };
 
   const deleteActivePlan = async () => {
-    if (!detail) return;
+    if (!detail || isGenerating) return;
     const confirmed = window.confirm(
       `Delete Plan #${detail.id}? A plan with shipments in progress cannot be deleted.`,
     );
@@ -379,7 +381,9 @@ export default function DistributionPlanning() {
               <select
                 value={selectedPlanningDate}
                 onChange={(event) => setSelectedPlanningDate(event.target.value)}
-                disabled={metadataLoading || isGenerating}
+                disabled={
+                  metadataLoading || isGenerating || isPlanMutationActive
+                }
               >
                 {!selectedPlanningDate && (
                   <option value="">Pilih tanggal planning</option>
@@ -403,7 +407,10 @@ export default function DistributionPlanning() {
               type="button"
               onClick={openGenerationDialog}
               disabled={
-                metadataLoading || isGenerating || !hasAvailablePlanningDate
+                metadataLoading ||
+                isGenerating ||
+                isPlanMutationActive ||
+                !hasAvailablePlanningDate
               }
             >
               <Sparkles size={18} /> Generate Plan
@@ -544,7 +551,9 @@ export default function DistributionPlanning() {
                   className="distribution-danger-button"
                   type="button"
                   onClick={deleteActivePlan}
-                  disabled={isDeleting || isSaving || isTransitioning}
+                  disabled={
+                    isGenerating || isDeleting || isSaving || isTransitioning
+                  }
                 >
                   <Trash2 size={17} /> {isDeleting ? "Deleting..." : "Delete Plan"}
                 </button>
@@ -554,7 +563,9 @@ export default function DistributionPlanning() {
                       className="distribution-secondary-button"
                       type="button"
                       onClick={saveChanges}
-                      disabled={!changedItems.length || isSaving}
+                      disabled={
+                        isGenerating || !changedItems.length || isSaving
+                      }
                     >
                       {isSaving ? "Saving..." : "Save Changes"}
                     </button>
@@ -562,7 +573,11 @@ export default function DistributionPlanning() {
                       className="distribution-primary-button"
                       type="button"
                       onClick={() => transitionPlan("finalize")}
-                      disabled={isTransitioning || changedItems.length > 0}
+                      disabled={
+                        isGenerating ||
+                        isTransitioning ||
+                        changedItems.length > 0
+                      }
                     >
                       <PackageCheck size={17} /> Finalize Plan
                     </button>
@@ -573,7 +588,7 @@ export default function DistributionPlanning() {
                     className="distribution-primary-button"
                     type="button"
                     onClick={() => transitionPlan("create-orders")}
-                    disabled={isTransitioning}
+                    disabled={isGenerating || isTransitioning}
                   >
                     <Plus size={17} />{" "}
                      {isTransitioning ? "Creating orders..." : "Create Orders"}
