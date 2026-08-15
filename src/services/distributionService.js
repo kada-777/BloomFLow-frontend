@@ -5,8 +5,12 @@ function unwrap(response) {
 }
 
 export const distributionService = {
-  async generatePlan() {
-    return unwrap(await api.post("/forecasts", {}));
+  async getPlanningMetadata() {
+    return unwrap(await api.get("/forecasts/planning-metadata"));
+  },
+
+  async generatePlan(planningDate) {
+    return unwrap(await api.post("/forecasts", { planningDate }));
   },
 
   async listPlans() {
