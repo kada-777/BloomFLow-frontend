@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PackageCheck, Plus, Sparkles, Trash2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
@@ -48,6 +48,7 @@ export default function DistributionPlanning() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const openPlanRequestId = useRef(0);
 
   const hydrateInputs = useCallback((plan) => {
     setInputs(
@@ -66,19 +67,26 @@ export default function DistributionPlanning() {
   }, []);
 
   const openPlan = useCallback(
-    async (id) => {
+    async (id, { throwOnError = false } = {}) => {
+      const requestId = ++openPlanRequestId.current;
       setError("");
       try {
         const plan = await distributionService.getPlan(id);
+        if (requestId !== openPlanRequestId.current) return false;
         setDetail(plan);
         hydrateInputs(plan);
+        return true;
       } catch (requestError) {
-        setError(
-          getApiError(
-            requestError,
-            "Unable to load distribution plan details.",
-          ),
-        );
+        if (requestId === openPlanRequestId.current) {
+          setError(
+            getApiError(
+              requestError,
+              "Unable to load distribution plan details.",
+            ),
+          );
+        }
+        if (throwOnError) throw requestError;
+        return false;
       }
     },
     [hydrateInputs],
@@ -111,11 +119,12 @@ export default function DistributionPlanning() {
 
   const refresh = useCallback(
     async ({ selectOpenPlan = true } = {}) => {
+      const requestId = selectOpenPlan ? ++openPlanRequestId.current : null;
       setLoading(true);
       setError("");
       try {
         const planRows = await distributionService.listPlans();
-        if (selectOpenPlan) {
+        if (selectOpenPlan && requestId === openPlanRequestId.current) {
           const open = (planRows || []).find((plan) =>
             ["DRAFT", "FINALIZED"].includes(plan.status),
           );
@@ -262,7 +271,12 @@ export default function DistributionPlanning() {
       const result = await distributionService.generatePlan(
         generationDialog.planningDate,
       );
-      await openPlan(result.distributionPlanId);
+      const planOpened = await openPlan(result.distributionPlanId, {
+        throwOnError: true,
+      });
+      if (!planOpened) {
+        throw new Error("Unable to load distribution plan details.");
+      }
       await Promise.all([
         refresh({ selectOpenPlan: false }),
         loadPlanningMetadata(),
@@ -275,11 +289,11 @@ export default function DistributionPlanning() {
       if (requestError.response?.status === 409) {
         setGenerationDialog(null);
         await loadPlanningMetadata();
+        const conflictMessage = requestError.response?.data?.message;
         setError(
-          getApiError(
-            requestError,
-            "Planning metadata has changed. Choose an available date and try again.",
-          ),
+          typeof conflictMessage === "string" && conflictMessage.trim()
+            ? conflictMessage
+            : "Planning metadata has changed. Choose an available date and try again.",
         );
       } else {
         setError(getApiError(requestError, "Unable to generate the plan."));
@@ -335,7 +349,10 @@ export default function DistributionPlanning() {
       await distributionService.deletePlan(detail.id);
       setDetail(null);
       setInputs({});
-      await refresh({ selectOpenPlan: true });
+      await Promise.all([
+        refresh({ selectOpenPlan: true }),
+        loadPlanningMetadata(),
+      ]);
       setSuccess("The active plan was deleted successfully.");
     } catch (requestError) {
       setError(getApiError(requestError, "Unable to delete the active plan."));
