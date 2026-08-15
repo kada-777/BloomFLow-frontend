@@ -270,35 +270,44 @@ export default function DistributionPlanning() {
     setIsGenerating(true);
     setError("");
     try {
-      const result = await distributionService.generatePlan(
-        generationDialog.planningDate,
-      );
-      const planOpened = await openPlan(result.distributionPlanId, {
-        throwOnError: true,
-      });
-      if (!planOpened) {
-        throw new Error("Unable to load distribution plan details.");
+      let result;
+      try {
+        result = await distributionService.generatePlan(
+          generationDialog.planningDate,
+        );
+      } catch (requestError) {
+        if (requestError.response?.status === 409) {
+          setGenerationDialog(null);
+          await loadPlanningMetadata();
+          const conflictMessage = requestError.response?.data?.message;
+          setError(
+            typeof conflictMessage === "string" && conflictMessage.trim()
+              ? conflictMessage
+              : "Planning metadata has changed. Choose an available date and try again.",
+          );
+        } else {
+          setError(getApiError(requestError, "Unable to generate the plan."));
+        }
+        return;
       }
-      await Promise.all([
-        refresh({ selectOpenPlan: false }),
-        loadPlanningMetadata(),
-      ]);
+
       setGenerationDialog(null);
       setSuccess(
         "A new DRAFT distribution plan was created from forecast recommendations.",
       );
-    } catch (requestError) {
-      if (requestError.response?.status === 409) {
-        setGenerationDialog(null);
-        await loadPlanningMetadata();
-        const conflictMessage = requestError.response?.data?.message;
+
+      const [openPlanResult] = await Promise.allSettled([
+        openPlan(result.distributionPlanId, { throwOnError: true }),
+        refresh({ selectOpenPlan: false }),
+        loadPlanningMetadata(),
+      ]);
+      if (
+        openPlanResult.status === "rejected" ||
+        openPlanResult.value === false
+      ) {
         setError(
-          typeof conflictMessage === "string" && conflictMessage.trim()
-            ? conflictMessage
-            : "Planning metadata has changed. Choose an available date and try again.",
+          "The plan was created successfully, but its details could not be displayed. Refresh the page to try opening it.",
         );
-      } else {
-        setError(getApiError(requestError, "Unable to generate the plan."));
       }
     } finally {
       setIsGenerating(false);
