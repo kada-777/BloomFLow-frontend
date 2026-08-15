@@ -1,0 +1,123 @@
+.generate-plan-dialog-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 24px 70px #2e211e28;
+  max-width: 470px;
+  padding: 30px;
+  position: relative;
+  width: 100%;
+}
+
+.generate-plan-dialog-close {
+  align-items: center;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--muted);
+  display: grid;
+  height: 34px;
+  justify-content: center;
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 34px;
+}
+
+.generate-plan-dialog-icon {
+  align-items: center;
+  background: #fcf2dc;
+  border-radius: 50%;
+  color: #9a721b;
+  display: inline-flex;
+  height: 62px;
+  justify-content: center;
+  width: 62px;
+}
+
+.generate-plan-dialog-card h2 {
+  color: var(--text);
+  font: 700 22px "Plus Jakarta Sans";
+  margin: 18px 0;
+}
+
+.generate-plan-dialog-meta {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.generate-plan-dialog-meta div {
+  align-items: center;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.generate-plan-dialog-meta dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.generate-plan-dialog-meta dd {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  text-align: right;
+}
+
+.generate-plan-dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.generate-plan-dialog-actions button {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0 18px;
+}
+
+.generate-plan-dialog-actions button:first-child {
+  background: var(--card);
+  color: var(--text);
+}
+
+.generate-plan-dialog-actions button:last-child {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.generate-plan-dialog-actions button:disabled,
+.generate-plan-dialog-close:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+@media (max-width: 480px) {
+  .generate-plan-dialog-card {
+    padding: 27px 18px 22px;
+  }
+
+  .generate-plan-dialog-meta div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .generate-plan-dialog-meta dd {
+    text-align: left;
+  }
+
+  .generate-plan-dialog-actions {
+    flex-direction: column-reverse;
+  }
+}
