@@ -76,7 +76,9 @@
 .daily-sales-items-heading h3 { color: var(--text); font-size: 15px; margin: 4px 0 0; }
 .daily-sales-item-card { background: var(--soft); border: 1px solid var(--border); border-radius: 14px; margin-top: 12px; padding: 16px; }
 .daily-sales-item-header { color: var(--muted); font-size: 10px; letter-spacing: .1em; }
-.daily-sales-item-grid { display: grid; gap: 14px; grid-template-columns: 1.5fr 1fr 1fr; margin-top: 14px; }
+.daily-sales-item-grid { display: grid; gap: 14px; grid-template-columns: 1.5fr 1fr 1fr 1fr; margin-top: 14px; }
+.daily-sales-stock-value { align-items: center; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); display: flex; font-size: 13px; font-weight: 700; height: 44px; padding: 0 12px; }
+.daily-sales-stock-notice { background: var(--soft); border: 1px solid var(--border); border-radius: 10px; color: var(--muted); font-size: 12px; margin-bottom: 16px; padding: 11px 12px; }
 .daily-sales-primary-button, .daily-sales-secondary-button { align-items: center; border-radius: 10px; display: inline-flex; font-size: 13px; font-weight: 700; gap: 7px; justify-content: center; min-height: 40px; padding: 0 14px; }
 .daily-sales-primary-button { background: var(--accent); border: 1px solid var(--accent); color: #fff; }
 .daily-sales-secondary-button { background: var(--soft); border: 1px solid var(--border); color: var(--text); }

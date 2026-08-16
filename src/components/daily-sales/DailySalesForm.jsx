@@ -10,6 +10,10 @@ export default function DailySalesForm({
   open,
   form,
   flowers,
+  availableStockByFlowerId,
+  stockLoading,
+  stockLoaded,
+  stockError,
   onChange,
   onAddItem,
   onRemoveItem,
@@ -41,6 +45,13 @@ export default function DailySalesForm({
     updateItem(index, field, normalizeIntegerQuantity(value));
   };
 
+  const availableStockLabel = (flowerId) => {
+    if (!flowerId) return "-";
+    if (stockLoading) return "Loading...";
+    if (!stockLoaded) return "Unavailable";
+    return Number(availableStockByFlowerId[String(flowerId)] ?? 0).toLocaleString("id-ID");
+  };
+
   return (
     <div className="modal-backdrop" role="presentation">
       <section className="daily-sales-modal" role="dialog" aria-modal="true" aria-labelledby="daily-sales-form-title">
@@ -58,6 +69,7 @@ export default function DailySalesForm({
 
           <div className="daily-sales-modal-body">
             {error && <div className="daily-sales-error" role="alert">{error}</div>}
+            {stockError && <div className="daily-sales-stock-notice" role="status">{stockError}</div>}
             <label className="daily-sales-field daily-sales-date-field">
               <span>Sales Date</span>
               <input
@@ -109,6 +121,12 @@ export default function DailySalesForm({
                     <input type="number" min="0" step="1" value={item.damagedQuantity} onChange={(event) => updateItem(index, "damagedQuantity", event.target.value)} onBlur={(event) => normalizeQuantityField(index, "damagedQuantity", event.target.value)} disabled={submitting} />
                     {fieldError(fieldErrors, index, "damagedQuantity") && <em>{fieldError(fieldErrors, index, "damagedQuantity")}</em>}
                   </label>
+                  <div className="daily-sales-field">
+                    <span>Current Available Stock</span>
+                    <div className="daily-sales-stock-value" aria-live="polite">
+                      {availableStockLabel(item.flowerId)}
+                    </div>
+                  </div>
                 </div>
               </section>
             ))}

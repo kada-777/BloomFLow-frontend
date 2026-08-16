@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getApiError } from "../services/api";
 import { dailySalesService } from "../services/dailySalesService";
+import { inventoryService } from "../services/inventoryService";
 import { normalizeIntegerQuantity } from "../utils/quantity";
 
 export const emptyDailySalesItem = () => ({
@@ -46,7 +47,7 @@ function getDailySalesError(error, fallback) {
   return detailMessage ? `${message} ${detailMessage}` : message;
 }
 
-export function validateDailySalesForm(payload) {
+export function validateDailySalesForm(payload, availableStockByFlowerId = null) {
   const errors = {};
   const items = payload.items || [];
   const flowerIds = new Set();
@@ -69,6 +70,13 @@ export function validateDailySalesForm(payload) {
     if (soldQuantity !== null && damagedQuantity !== null
       && Number(soldQuantity) + Number(damagedQuantity) <= 0) {
       errors[`${prefix}.soldQuantity`] = "Sold and damaged quantities must total more than zero.";
+    }
+    if (flowerId && availableStockByFlowerId
+      && soldQuantity !== null && damagedQuantity !== null) {
+      const availableStock = Number(availableStockByFlowerId[flowerId] ?? 0);
+      if (Number(soldQuantity) + Number(damagedQuantity) > availableStock) {
+        errors[`${prefix}.soldQuantity`] = `Sold and damaged quantities cannot exceed available stock (${availableStock}).`;
+      }
     }
   });
 
@@ -127,6 +135,10 @@ export default function useDailySales() {
   const [sort, setSort] = useState("default");
   const [pagination, setPagination] = useState(null);
   const [flowers, setFlowers] = useState([]);
+  const [branchStock, setBranchStock] = useState([]);
+  const [stockLoading, setStockLoading] = useState(false);
+  const [stockLoaded, setStockLoaded] = useState(false);
+  const [stockError, setStockError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState(emptyDailySalesForm);
@@ -138,6 +150,29 @@ export default function useDailySales() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState("");
+
+  const availableStockByFlowerId = useMemo(
+    () => Object.fromEntries(
+      branchStock.map((entry) => [String(entry.flowerId), entry.totalQuantity ?? "0"]),
+    ),
+    [branchStock],
+  );
+
+  const loadBranchStock = useCallback(async () => {
+    setStockLoading(true);
+    setStockError("");
+    try {
+      const result = await inventoryService.getMyBranchStock({ limit: 100 });
+      setBranchStock(normalizeList(result.data));
+      setStockLoaded(true);
+    } catch (requestError) {
+      setBranchStock([]);
+      setStockLoaded(false);
+      setStockError(getDailySalesError(requestError, "Unable to load current branch stock."));
+    } finally {
+      setStockLoading(false);
+    }
+  }, []);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -182,6 +217,7 @@ export default function useDailySales() {
     setFormError("");
     setSuccessMessage("");
     setFormOpen(true);
+    loadBranchStock();
   };
 
   const closeCreate = () => {
@@ -213,7 +249,10 @@ export default function useDailySales() {
 
   const submitCreate = async (payload) => {
     const normalizedPayload = normalizeQuantityFields(payload);
-    const validationErrors = validateDailySalesForm(normalizedPayload);
+    const validationErrors = validateDailySalesForm(
+      normalizedPayload,
+      stockLoaded ? availableStockByFlowerId : null,
+    );
     if (Object.keys(validationErrors).length) {
       setFormError("Review the invalid Daily Sales fields.");
       return { errors: validationErrors };
@@ -225,7 +264,7 @@ export default function useDailySales() {
       await dailySalesService.create(normalizePayload(normalizedPayload));
       setFormOpen(false);
       setSuccessMessage("Daily Sales saved successfully.");
-      await refresh();
+      await Promise.all([refresh(), loadBranchStock()]);
       return { errors: {} };
     } catch (requestError) {
       const message = getDailySalesError(requestError, "Unable to save Daily Sales.");
@@ -240,6 +279,10 @@ export default function useDailySales() {
     sales,
     tableRows: summarizeSales(sales),
     flowers,
+    availableStockByFlowerId,
+    stockLoading,
+    stockLoaded,
+    stockError,
     loading,
     error,
     refresh,

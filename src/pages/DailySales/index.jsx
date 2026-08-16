@@ -85,6 +85,10 @@ export default function DailySales() {
         open={dailySales.formOpen}
         form={dailySales.form}
         flowers={dailySales.flowers}
+        availableStockByFlowerId={dailySales.availableStockByFlowerId}
+        stockLoading={dailySales.stockLoading}
+        stockLoaded={dailySales.stockLoaded}
+        stockError={dailySales.stockError}
         onChange={handleFormChange}
         onAddItem={() => dailySales.setForm((current) => ({ ...current, items: [...current.items, emptyDailySalesItem()] }))}
         onRemoveItem={(index) => dailySales.setForm((current) => ({
