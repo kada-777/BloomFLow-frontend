@@ -70,7 +70,7 @@ export default function Receiving() {
 
       <GenericDataTable
         columns={columns}
-        data={receiving.filteredReceivings}
+        data={receiving.receivings}
         loading={receiving.loading}
         emptyMessage="No matching receiving records found."
         className="receiving-table-card table-card"

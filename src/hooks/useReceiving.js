@@ -82,6 +82,7 @@ export default function useReceiving() {
   const [farms, setFarms] = useState([]);
   const [flowers, setFlowers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedFarm, setSelectedFarm] = useState("all");
   const [selectedDate, setSelectedDate] = useState("");
   const [page, setPage] = useState(1);
@@ -101,7 +102,13 @@ export default function useReceiving() {
     setLoading(true);
     setError("");
     const results = await Promise.allSettled([
-      receivingService.list({ page, limit: 10, receivedDate: selectedDate }),
+      receivingService.list({
+        page,
+        limit: 10,
+        receivedDate: selectedDate,
+        farmId: selectedFarm === "all" ? "" : selectedFarm,
+        search: debouncedSearch,
+      }),
       receivingService.listFarms(),
       receivingService.listFlowers(),
     ]);
@@ -117,7 +124,7 @@ export default function useReceiving() {
     if (flowerResult.status === "fulfilled") setFlowers(normalizeList(flowerResult.value));
     else setError((current) => current || getApiError(flowerResult.reason, "Unable to load flowers."));
     setLoading(false);
-  }, [page, selectedDate]);
+  }, [debouncedSearch, page, selectedDate, selectedFarm]);
 
   useEffect(() => {
     refresh();
@@ -126,6 +133,13 @@ export default function useReceiving() {
   useEffect(() => {
     if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
   }, [page, pagination]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, 300);
+    return () => window.clearTimeout(timeoutId);
+  }, [searchTerm]);
 
   const updateSearchTerm = (value) => {
     setSearchTerm(value);
@@ -139,16 +153,6 @@ export default function useReceiving() {
     setSelectedDate(value);
     setPage(1);
   };
-
-  const filteredReceivings = receivings.filter((receiving) => {
-    const farmName = receiving.farm?.name || "";
-    const id = String(receiving.id || "");
-    const query = searchTerm.trim().toLowerCase();
-    const matchesSearch = !query || id.includes(query) || farmName.toLowerCase().includes(query) || String(receiving.farmId || "").includes(query);
-    const matchesFarm = selectedFarm === "all" || String(receiving.farmId) === String(selectedFarm);
-    const matchesDate = !selectedDate || String(receiving.receivedDate).slice(0, 10) === selectedDate;
-    return matchesSearch && matchesFarm && matchesDate;
-  });
 
   const openCreate = () => {
     setDetail(null);
@@ -206,7 +210,6 @@ export default function useReceiving() {
 
   return {
     receivings,
-    filteredReceivings,
     farms,
     flowers,
     searchTerm,
