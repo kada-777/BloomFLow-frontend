@@ -157,20 +157,20 @@ table{
 
 thead tr{
 
-    background:#F6F0E8;
+    background:var(--soft);
 }
 
 thead th{
 
     padding:18px 22px;
 
-    background:#F6F0E8;
+    background:var(--soft);
 
     font-size:13px;
 
     font-weight:600;
 
-    color:#8C7C67;
+    color:var(--muted);
 
     text-transform:uppercase;
 
@@ -192,7 +192,7 @@ tbody tr {
 
 tbody tr:hover {
 
-    background: #FCFAF7;
+    background: var(--soft);
 }
 
 tbody td{
@@ -203,7 +203,7 @@ tbody td{
 
     border-bottom:1px solid var(--border);
 
-    background:#fff;
+    background:var(--card);
 
     vertical-align:middle;
 }

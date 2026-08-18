@@ -4,7 +4,7 @@ export default function GenericDataTable({
   columns,
   data,
   loading,
-  emptyMessage = "Belum ada data.",
+  emptyMessage = "No data available.",
   rowKey = (row) => row.id,
   renderActions,
   className = "table-card",
@@ -12,7 +12,7 @@ export default function GenericDataTable({
   return (
     <div className={`generic-data-table ${className}`}>
       {loading ? (
-        <div className="generic-table-state">Memuat data...</div>
+        <div className="generic-table-state">Loading data...</div>
       ) : data.length === 0 ? (
         <div className="generic-table-state">{emptyMessage}</div>
       ) : (

@@ -9,7 +9,7 @@ export default function ActionButtons({ onEdit, onDelete, deleteDisabled = false
       </button>
       {onDelete && (
         <button className="delete-btn" type="button" onClick={onDelete} disabled={deleteDisabled}>
-          <Trash2 size={16} /> Hapus
+          <Trash2 size={16} /> Delete
         </button>
       )}
     </div>

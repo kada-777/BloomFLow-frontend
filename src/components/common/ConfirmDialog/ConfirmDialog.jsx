@@ -16,7 +16,7 @@ export default function ConfirmDialog({
   return (
     <Modal open={open} onClose={submitting ? undefined : onCancel} labelledBy="confirm-dialog-title">
       <section className="confirm-dialog-card">
-        <button className="confirm-dialog-close" type="button" onClick={onCancel} disabled={submitting} aria-label="Tutup dialog">
+        <button className="confirm-dialog-close" type="button" onClick={onCancel} disabled={submitting} aria-label="Close dialog">
           <X size={18} />
         </button>
         <div className={`confirm-dialog-icon ${danger ? "is-danger" : ""}`}>
@@ -27,7 +27,7 @@ export default function ConfirmDialog({
         <div className="confirm-dialog-actions">
           <button className="confirm-dialog-cancel" type="button" onClick={onCancel} disabled={submitting}>{cancelText}</button>
           <button className={`confirm-dialog-confirm ${danger ? "is-danger" : ""}`} type="button" onClick={onConfirm} disabled={submitting}>
-            {submitting ? "Memproses..." : confirmText}
+            {submitting ? "Processing..." : confirmText}
           </button>
         </div>
       </section>

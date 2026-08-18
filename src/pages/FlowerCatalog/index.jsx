@@ -6,24 +6,29 @@ export default function FlowerCatalog() {
       resource="flowers"
       title="Flower Catalog"
       subtitle="The central product library for every branch"
-      addLabel="Tambah Bunga"
-      searchPlaceholder="Cari nama atau varietas bunga..."
-      emptyMessage="Belum ada bunga yang tersedia."
+      addLabel="Add Flower"
+      searchPlaceholder="Search flower name or variety..."
+      emptyMessage="No flowers available."
       searchableFields={["name", "variety"]}
+      sortOptions={[
+        { value: "default", label: "Default" },
+        { value: "name_asc", label: "Flower A-Z" },
+        { value: "name_desc", label: "Flower Z-A" },
+      ]}
       columns={[
-        { key: "name", label: "NAMA BUNGA" },
-        { key: "variety", label: "VARIETAS" },
+        { key: "name", label: "FLOWER NAME" },
+        { key: "variety", label: "VARIETY" },
       ]}
       fields={[
-        { name: "name", label: "Nama Bunga", required: true, placeholder: "Contoh: Mawar Merah" },
-        { name: "variety", label: "Varietas", required: true, placeholder: "Contoh: Rose" },
+        { name: "name", label: "Flower Name", required: true, placeholder: "Example: Red Rose" },
+        { name: "variety", label: "Variety", required: true, placeholder: "Example: Rose" },
       ]}
       formCopy={{
-        entityName: "Bunga",
-        createTitle: "Tambah Bunga Baru",
-        createSubtitle: "Tambahkan bunga ke katalog BloomFlow",
-        editTitle: "Edit Bunga",
-        editSubtitle: "Perbarui informasi bunga",
+        entityName: "Flower",
+        createTitle: "Add New Flower",
+        createSubtitle: "Add a flower to the BloomFlow catalog",
+        editTitle: "Edit Flower",
+        editSubtitle: "Update flower information",
       }}
     />
   );

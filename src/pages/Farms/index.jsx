@@ -6,24 +6,24 @@ export default function Farms() {
       resource="farms"
       title="Supplier Farms"
       subtitle="Cultivation capacity, harvesting, and partner health"
-      addLabel="Tambah Farm"
-      searchPlaceholder="Cari nama atau lokasi farm..."
-      emptyMessage="Belum ada farm yang tersedia."
+      addLabel="Add Farm"
+      searchPlaceholder="Search farm name or location..."
+      emptyMessage="No farms available."
       searchableFields={["name", "location"]}
       columns={[
-        { key: "name", label: "NAMA FARM" },
-        { key: "location", label: "LOKASI" },
+        { key: "name", label: "FARM NAME" },
+        { key: "location", label: "LOCATION" },
       ]}
       fields={[
-        { name: "name", label: "Nama Farm", required: true, placeholder: "Contoh: Kebun Bunga Bandung" },
-        { name: "location", label: "Lokasi", required: true, placeholder: "Contoh: Bandung, Jawa Barat" },
+        { name: "name", label: "Farm Name", required: true, placeholder: "Example: Bandung Flower Farm" },
+        { name: "location", label: "Location", required: true, placeholder: "Example: Bandung, West Java" },
       ]}
       formCopy={{
         entityName: "Farm",
-        createTitle: "Tambah Farm Baru",
-        createSubtitle: "Tambahkan farm pemasok ke BloomFlow",
+        createTitle: "Add New Farm",
+        createSubtitle: "Add a supplier farm to BloomFlow",
         editTitle: "Edit Farm",
-        editSubtitle: "Perbarui informasi farm",
+        editSubtitle: "Update farm information",
       }}
     />
   );

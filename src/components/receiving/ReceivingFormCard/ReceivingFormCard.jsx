@@ -69,7 +69,7 @@ export default function ReceivingFormCard({
   };
 
   const title = mode === "view" ? "Detail Receiving" : mode === "edit" ? "Edit Receiving" : "New Receiving";
-  const subtitle = mode === "view" ? "Review receiving dan hasil quality control" : "Catat penerimaan bunga dan hasil quality control Head Office";
+  const subtitle = mode === "view" ? "Review Receiving and quality control results" : "Record flower receipts and Head Office quality control results";
 
   return (
     <Modal open={open} onClose={submitting ? undefined : onClose} labelledBy="receiving-form-title">
@@ -80,13 +80,13 @@ export default function ReceivingFormCard({
             <h2 id="receiving-form-title">{title}</h2>
             <p>{subtitle}</p>
           </div>
-          <button className="receiving-form-close" type="button" onClick={onClose} disabled={submitting} aria-label="Tutup form receiving"><X size={20} /></button>
+          <button className="receiving-form-close" type="button" onClick={onClose} disabled={submitting} aria-label="Close Receiving form"><X size={20} /></button>
         </header>
 
         <div className="receiving-form-body">
           {(error || detailError) && <div className="receiving-form-error" role="alert">{error || detailError}</div>}
           {detailLoading ? (
-            <div className="receiving-form-state">Memuat detail receiving...</div>
+            <div className="receiving-form-state">Loading Receiving details...</div>
           ) : (
             <>
               <div className="receiving-form-meta">
@@ -95,7 +95,7 @@ export default function ReceivingFormCard({
                   <div className="receiving-readonly-value">{receiving?.id ? `REC-${receiving.id}` : "Generated after submit"}</div>
                 </label>
                 <label>
-                  <span><CalendarDays size={15} /> Tanggal Diterima</span>
+                  <span><CalendarDays size={15} /> Received Date</span>
                   <input type="date" value={form.receivedDate} onChange={(event) => setForm((current) => ({ ...current, receivedDate: event.target.value }))} disabled={readOnly || submitting} />
                   {fieldErrors.receivedDate && <em>{fieldErrors.receivedDate}</em>}
                 </label>
@@ -103,7 +103,7 @@ export default function ReceivingFormCard({
                   <span>Farm</span>
                   {readOnly ? <div className="receiving-readonly-value">{receiving?.farm?.name || form.farmId || "-"}</div> : (
                     <select value={form.farmId} onChange={(event) => setForm((current) => ({ ...current, farmId: event.target.value }))} disabled={submitting}>
-                      <option value="">Pilih farm</option>
+                      <option value="">Select a farm</option>
                       {farms.map((farm) => <option key={farm.id} value={farm.id}>{farm.name} · {farm.location}</option>)}
                     </select>
                   )}
@@ -112,8 +112,8 @@ export default function ReceivingFormCard({
               </div>
 
               <div className="receiving-items-heading">
-                <div><span>FLOWER ITEMS</span><h3>Detail bunga dan hasil QC</h3></div>
-                {!readOnly && <button className="receiving-add-item" type="button" onClick={addItem}><Plus size={16} /> Tambah Jenis Bunga</button>}
+                <div><span>FLOWER ITEMS</span><h3>Flower details and quality control results</h3></div>
+                {!readOnly && <button className="receiving-add-item" type="button" onClick={addItem}><Plus size={16} /> Add Flower Type</button>}
               </div>
 
               {form.items.map((item, index) => (
@@ -134,8 +134,8 @@ export default function ReceivingFormCard({
         </div>
 
         <footer className="receiving-form-footer">
-          <button className="receiving-secondary-button" type="button" onClick={onClose} disabled={submitting}>Tutup</button>
-          {!readOnly && <button className="receiving-primary-button" type="submit" disabled={submitting || detailLoading}>{submitting ? "Menyimpan..." : <><Save size={17} /> Submit Receiving</>}</button>}
+          <button className="receiving-secondary-button" type="button" onClick={onClose} disabled={submitting}>Close</button>
+          {!readOnly && <button className="receiving-primary-button" type="submit" disabled={submitting || detailLoading}>{submitting ? "Saving..." : <><Save size={17} /> Submit Receiving</>}</button>}
         </footer>
       </form>
     </Modal>

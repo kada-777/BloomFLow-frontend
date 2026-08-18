@@ -6,7 +6,6 @@ import {
   Package,
   Truck,
   Sparkles,
-  ChartNoAxesCombined,
   ShieldCheck,
   MapPin,
   Sprout,
@@ -14,7 +13,8 @@ import {
   Users,
   Settings,
   ChevronLeft,
-  ChevronRight, Warehouse,
+  ChevronRight,
+  Warehouse,
   ReceiptText,
 } from "lucide-react";
 import logo from "../assets/Logo.png";
@@ -26,7 +26,6 @@ const menus = {
       "OVERVIEW",
       [
         ["Dashboard", LayoutDashboard, "/"],
-        ["Analytics", ChartNoAxesCombined, "/analytics"],
       ],
     ],
     [
@@ -38,37 +37,21 @@ const menus = {
         ["Flower Catalog", Flower2, "/flower-catalog"],
       ],
     ],
-    [
-      "SUPPLY CHAIN",
-      [
-        ["Inventory", Package, "/inventory"],
-        ["Distribution", Truck, "/distribution"],
-        ["Forecasting", Sparkles, "/forecasting"],
-        ["Quality Control", ShieldCheck, "/quality-control"],
-      ],
-    ],
-    
-    [
-      "ADMINISTRATION",
-      [
-        
-        ["Settings", Settings, "/settings"],
-      ],
-    ],
+    ["SUPPLY CHAIN", [["Distribution", Truck, "/distribution"]]],
   ],
   "Head Office": [
     [
       "PLANNING",
       [
         ["Dashboard", LayoutDashboard, "/"],
-        ["Forecasting", Sparkles, "/forecasting"],
-        ["Analytics", ChartNoAxesCombined, "/analytics"],
+
       ],
     ],
     [
       "FULFILMENT",
       [
         ["Receiving", Package, "/receiving"],
+        ["Distribution Planning", Sparkles, "/distribution-planning"],
         ["Distribution", Truck, "/distribution"],
       ],
     ],
@@ -81,12 +64,6 @@ const menus = {
         ["Inventory", Package, "/inventory"],
         ["Distribution", Truck, "/distribution"],
         ["Daily Sales", ReceiptText, "/daily-sales"],
-      ],
-    ],
-    [
-      "FRESHNESS",
-      [
-        ["Quality Control", ShieldCheck, "/quality-control"],
       ],
     ],
   ],
@@ -120,13 +97,11 @@ export default function AppLayout() {
 
   return (
     <div className={`shell ${isCollapsed ? "sidebar-collapsed" : ""}`}>
-      <aside className={`${isCollapsed ? "collapsed" : ""} ${open ? "open" : ""}`}>
+      <aside
+        className={`${isCollapsed ? "collapsed" : ""} ${open ? "open" : ""}`}
+      >
         <div className="brand">
-          <img
-            className="brand-logo"
-            src={logo}
-            alt="BloomFlow Logo"
-          />
+          <img className="brand-logo" src={logo} alt="BloomFlow Logo" />
           <span>BloomFlow</span>
           <button
             className="sidebar-mobile-close"

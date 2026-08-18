@@ -6,6 +6,7 @@ import ActionButtons from "../../components/common/ActionButtons/ActionButtons";
 import ActionNotice from "../../components/common/ActionNotice/ActionNotice";
 import ConfirmDialog from "../../components/common/ConfirmDialog/ConfirmDialog";
 import GenericDataTable from "../../components/common/GenericDataTable/GenericDataTable";
+import Pagination from "../../components/common/Pagination/Pagination";
 import SearchBar from "../../components/common/SearchBar/SearchBar";
 import UserFormCard from "../../components/users/UserFormCard/UserFormCard";
 import "./user.css";
@@ -51,6 +52,8 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [branches, setBranches] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [formOpen, setFormOpen] = useState(false);
@@ -72,9 +75,10 @@ export default function UserManagement() {
     ]);
 
     if (usersResult.status === "fulfilled") {
-      setUsers(normalizeList(usersResult.value));
+      setUsers(normalizeList(usersResult.value.data));
+      setPagination(usersResult.value.pagination);
     } else {
-      setPageError(getApiError(usersResult.reason, "Pengguna gagal dimuat."));
+      setPageError(getApiError(usersResult.reason, "Unable to load users."));
     }
 
     if (branchesResult.status === "fulfilled") {
@@ -82,16 +86,25 @@ export default function UserManagement() {
     } else {
       setPageError(
         (current) =>
-          current || getApiError(branchesResult.reason, "Cabang gagal dimuat."),
+          current || getApiError(branchesResult.reason, "Unable to load branches."),
       );
     }
 
     setLoading(false);
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  const updateSearchTerm = (value) => {
+    setSearchTerm(value);
+    setPage(1);
+  };
 
   const openCreateForm = () => {
     setEditingUser(null);
@@ -124,7 +137,7 @@ export default function UserManagement() {
       closeForm();
       await loadData();
     } catch (error) {
-      setFormError(getApiError(error, "Perubahan pengguna gagal disimpan."));
+      setFormError(getApiError(error, "Unable to save user changes."));
     } finally {
       setFormSubmitting(false);
     }
@@ -152,7 +165,7 @@ export default function UserManagement() {
       closeDeleteDialog();
       await loadData();
     } catch (error) {
-      setDeleteError(getApiError(error, "Pengguna gagal dinonaktifkan."));
+      setDeleteError(getApiError(error, "Unable to deactivate the user."));
     } finally {
       setDeleteSubmitting(false);
     }
@@ -163,7 +176,7 @@ export default function UserManagement() {
   const columns = [
     {
       key: "email",
-      label: "PENGGUNA",
+       label: "USER",
       render: (user) => (
         <div className="user-info">
           <div className="avatar">{getInitials(user)}</div>
@@ -182,17 +195,17 @@ export default function UserManagement() {
     },
     {
       key: "branch",
-      label: "CABANG",
+       label: "BRANCH",
       render: (user) =>
         user.branch?.name ||
         (user.role === "STAFF_BRANCH" ? "-" : "Head Office"),
     },
     {
       key: "isActive",
-      label: "STATUS",
+       label: "STATUS",
       render: (user) => (
         <span className={`status ${user.isActive ? "active" : "inactive"}`}>
-          {user.isActive ? "Aktif" : "Nonaktif"}
+           {user.isActive ? "Active" : "Inactive"}
         </span>
       ),
     },
@@ -202,20 +215,20 @@ export default function UserManagement() {
     <div className="user-page">
       <div className="page-header">
         <div>
-          <h1>Manajemen Pengguna</h1>
-          <p>Kelola akses dan peran staf operasional di seluruh cabang</p>
+          <h1>User Management</h1>
+          <p>Manage operational staff access and roles across all branches</p>
         </div>
         <button className="add-btn" type="button" onClick={openCreateForm}>
           <UserPlus size={18} />
-          Tambah Pengguna
+          Add User
         </button>
       </div>
 
       <SearchBar
         value={searchTerm}
-        onChange={setSearchTerm}
-        placeholder="Cari email, role, cabang..."
-        ariaLabel="Cari pengguna"
+        onChange={updateSearchTerm}
+        placeholder="Search email, role, or branch..."
+        ariaLabel="Search users"
       />
 
       <ActionNotice
@@ -229,7 +242,7 @@ export default function UserManagement() {
         columns={columns}
         data={filteredUsers}
         loading={loading}
-        emptyMessage="Belum ada pengguna yang cocok."
+        emptyMessage="No matching users found."
         renderActions={(user) => (
           <ActionButtons
             onEdit={() => openEditForm(user)}
@@ -237,6 +250,7 @@ export default function UserManagement() {
           />
         )}
       />
+      <Pagination pagination={pagination} onPageChange={setPage} disabled={loading} />
 
       <UserFormCard
         open={formOpen}
@@ -251,13 +265,13 @@ export default function UserManagement() {
 
       <ConfirmDialog
         open={deleteOpen}
-        title="Hapus Pengguna?"
+        title="Delete User?"
         message={
           deleteError ||
-          "Pengguna akan dinonaktifkan dan tidak dapat mengakses aplikasi lagi."
+          "The user will be deactivated and will no longer be able to access the application."
         }
-        confirmText="Hapus"
-        cancelText="Batal"
+        confirmText="Delete"
+        cancelText="Cancel"
         danger
         onConfirm={handleDelete}
         onCancel={closeDeleteDialog}

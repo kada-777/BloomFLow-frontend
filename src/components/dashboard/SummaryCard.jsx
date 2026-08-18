@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import DashboardState from "./DashboardState";
 
-export default function SummaryCard({ label, value, note, icon: Icon, unsupported, error, onRetry }) {
+export default function SummaryCard({ label, value, note, details, icon: Icon, unsupported, error, onRetry }) {
   return (
     <motion.article whileHover={{ y: -3 }} className="dashboard-summary-card">
       <div className="dashboard-summary-icon">{Icon && <Icon size={18} />}</div>
@@ -16,6 +16,7 @@ export default function SummaryCard({ label, value, note, icon: Icon, unsupporte
         <>
           <h2>{value ?? "-"}</h2>
           {note && <small>{note}</small>}
+          {details && <div className="dashboard-summary-details">{details}</div>}
         </>
       )}
     </motion.article>

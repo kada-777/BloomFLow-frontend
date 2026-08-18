@@ -25,7 +25,7 @@ export default function TopFlowerSalesChart({ data, loading, error, onRetry }) {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      ) : <DashboardState type="unsupported" />}
+      ) : <DashboardState message="No Flower Sales available." />}
     </DashboardCard>
   );
 }

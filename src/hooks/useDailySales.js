@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getApiError } from "../services/api";
 import { dailySalesService } from "../services/dailySalesService";
+import { inventoryService } from "../services/inventoryService";
+import { normalizeIntegerQuantity } from "../utils/quantity";
 
 export const emptyDailySalesItem = () => ({
   flowerId: "",
@@ -26,8 +28,11 @@ function normalizeList(value) {
   return [];
 }
 
-function decimal(value) {
-  return /^\d+(\.\d{1,2})?$/.test(String(value).trim()) ? Number(value) : null;
+function normalizeDailySalesQuantity(value) {
+  const normalized = String(value ?? "").trim();
+  return /^\d+(\.\d{1,2})?$/.test(normalized)
+    ? normalizeIntegerQuantity(normalized)
+    : null;
 }
 
 function getDailySalesError(error, fallback) {
@@ -42,28 +47,36 @@ function getDailySalesError(error, fallback) {
   return detailMessage ? `${message} ${detailMessage}` : message;
 }
 
-export function validateDailySalesForm(payload) {
+export function validateDailySalesForm(payload, availableStockByFlowerId = null) {
   const errors = {};
   const items = payload.items || [];
   const flowerIds = new Set();
 
-  if (!payload.salesDate) errors.salesDate = "Tanggal sales wajib diisi.";
-  if (!items.length) errors.items = "Minimal satu jenis bunga harus ditambahkan.";
+  if (!payload.salesDate) errors.salesDate = "The sales date is required.";
+  if (!items.length) errors.items = "Add at least one flower type.";
 
   items.forEach((item, index) => {
     const prefix = `items.${index}`;
     const flowerId = String(item.flowerId || "");
-    const soldQuantity = decimal(item.soldQuantity);
-    const damagedQuantity = decimal(item.damagedQuantity);
+    const soldQuantity = normalizeDailySalesQuantity(item.soldQuantity);
+    const damagedQuantity = normalizeDailySalesQuantity(item.damagedQuantity);
 
-    if (!flowerId) errors[`${prefix}.flowerId`] = "Flower wajib dipilih.";
-    if (flowerId && flowerIds.has(flowerId)) errors[`${prefix}.flowerId`] = "Flower tidak boleh sama.";
+    if (!flowerId) errors[`${prefix}.flowerId`] = "A flower must be selected.";
+    if (flowerId && flowerIds.has(flowerId)) errors[`${prefix}.flowerId`] = "Flowers cannot be duplicated.";
     if (flowerId) flowerIds.add(flowerId);
 
-    if (soldQuantity === null) errors[`${prefix}.soldQuantity`] = "Masukkan angka desimal yang valid.";
-    if (damagedQuantity === null) errors[`${prefix}.damagedQuantity`] = "Masukkan angka desimal yang valid.";
-    if (soldQuantity !== null && damagedQuantity !== null && soldQuantity + damagedQuantity <= 0) {
-      errors[`${prefix}.soldQuantity`] = "Sold dan damaged quantity harus lebih dari nol.";
+    if (soldQuantity === null) errors[`${prefix}.soldQuantity`] = "Enter a valid non-negative quantity.";
+    if (damagedQuantity === null) errors[`${prefix}.damagedQuantity`] = "Enter a valid non-negative quantity.";
+    if (soldQuantity !== null && damagedQuantity !== null
+      && Number(soldQuantity) + Number(damagedQuantity) <= 0) {
+      errors[`${prefix}.soldQuantity`] = "Sold and damaged quantities must total more than zero.";
+    }
+    if (flowerId && availableStockByFlowerId
+      && soldQuantity !== null && damagedQuantity !== null) {
+      const availableStock = Number(availableStockByFlowerId[flowerId] ?? 0);
+      if (Number(soldQuantity) + Number(damagedQuantity) > availableStock) {
+        errors[`${prefix}.soldQuantity`] = `Sold and damaged quantities cannot exceed available stock (${availableStock}).`;
+      }
     }
   });
 
@@ -75,9 +88,24 @@ function normalizePayload(payload) {
     salesDate: payload.salesDate,
     items: payload.items.map((item) => ({
       flowerId: Number(item.flowerId),
-      soldQuantity: String(item.soldQuantity).trim(),
-      damagedQuantity: String(item.damagedQuantity).trim(),
+      soldQuantity: normalizeIntegerQuantity(item.soldQuantity),
+      damagedQuantity: normalizeIntegerQuantity(item.damagedQuantity),
     })),
+  };
+}
+
+function normalizeQuantityFields(payload) {
+  return {
+    ...payload,
+    items: payload.items.map((item) => {
+      const soldQuantity = normalizeDailySalesQuantity(item.soldQuantity);
+      const damagedQuantity = normalizeDailySalesQuantity(item.damagedQuantity);
+      return {
+        ...item,
+        soldQuantity: soldQuantity === null ? item.soldQuantity : soldQuantity,
+        damagedQuantity: damagedQuantity === null ? item.damagedQuantity : damagedQuantity,
+      };
+    }),
   };
 }
 
@@ -103,7 +131,14 @@ function summarizeSales(sales) {
 
 export default function useDailySales() {
   const [sales, setSales] = useState([]);
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState("default");
+  const [pagination, setPagination] = useState(null);
   const [flowers, setFlowers] = useState([]);
+  const [branchStock, setBranchStock] = useState([]);
+  const [stockLoading, setStockLoading] = useState(false);
+  const [stockLoaded, setStockLoaded] = useState(false);
+  const [stockError, setStockError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState(emptyDailySalesForm);
@@ -116,39 +151,73 @@ export default function useDailySales() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState("");
 
+  const availableStockByFlowerId = useMemo(
+    () => Object.fromEntries(
+      branchStock.map((entry) => [String(entry.flowerId), entry.totalQuantity ?? "0"]),
+    ),
+    [branchStock],
+  );
+
+  const loadBranchStock = useCallback(async () => {
+    setStockLoading(true);
+    setStockError("");
+    try {
+      const result = await inventoryService.getMyBranchStock({ limit: 100 });
+      setBranchStock(normalizeList(result.data));
+      setStockLoaded(true);
+    } catch (requestError) {
+      setBranchStock([]);
+      setStockLoaded(false);
+      setStockError(getDailySalesError(requestError, "Unable to load current branch stock."));
+    } finally {
+      setStockLoading(false);
+    }
+  }, []);
+
   const refresh = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const [salesResult, flowersResult] = await Promise.allSettled([
-        dailySalesService.list(),
+        dailySalesService.list({ page, limit: 10, sort }),
         dailySalesService.listFlowers(),
       ]);
 
       if (salesResult.status === "fulfilled") {
-        setSales(normalizeList(salesResult.value));
+        setSales(normalizeList(salesResult.value.data));
+        setPagination(salesResult.value.pagination);
         if (flowersResult.status === "rejected") {
-          setError(getDailySalesError(flowersResult.reason, "Data flower gagal dimuat."));
+          setError(getDailySalesError(flowersResult.reason, "Unable to load flowers."));
         }
       } else {
-        setError(getDailySalesError(salesResult.reason, "Data daily sales gagal dimuat."));
+        setError(getDailySalesError(salesResult.reason, "Unable to load daily sales."));
       }
 
       if (flowersResult.status === "fulfilled") setFlowers(normalizeList(flowersResult.value));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, sort]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  const updateSort = (value) => {
+    setSort(value);
+    setPage(1);
+  };
 
   const openCreate = () => {
     setForm(emptyDailySalesForm());
     setFormError("");
     setSuccessMessage("");
     setFormOpen(true);
+    loadBranchStock();
   };
 
   const closeCreate = () => {
@@ -165,7 +234,7 @@ export default function useDailySales() {
     try {
       setDetail(await dailySalesService.getById(id));
     } catch (requestError) {
-      setDetailError(getDailySalesError(requestError, "Detail daily sales gagal dimuat."));
+      setDetailError(getDailySalesError(requestError, "Unable to load daily sales details."));
     } finally {
       setDetailLoading(false);
     }
@@ -179,22 +248,26 @@ export default function useDailySales() {
   };
 
   const submitCreate = async (payload) => {
-    const validationErrors = validateDailySalesForm(payload);
+    const normalizedPayload = normalizeQuantityFields(payload);
+    const validationErrors = validateDailySalesForm(
+      normalizedPayload,
+      stockLoaded ? availableStockByFlowerId : null,
+    );
     if (Object.keys(validationErrors).length) {
-      setFormError("Periksa kembali field Daily Sales yang belum valid.");
+      setFormError("Review the invalid Daily Sales fields.");
       return { errors: validationErrors };
     }
 
     setSubmitting(true);
     setFormError("");
     try {
-      await dailySalesService.create(normalizePayload(payload));
+      await dailySalesService.create(normalizePayload(normalizedPayload));
       setFormOpen(false);
-      setSuccessMessage("Daily Sales berhasil disimpan.");
-      await refresh();
+      setSuccessMessage("Daily Sales saved successfully.");
+      await Promise.all([refresh(), loadBranchStock()]);
       return { errors: {} };
     } catch (requestError) {
-      const message = getDailySalesError(requestError, "Daily Sales gagal disimpan.");
+      const message = getDailySalesError(requestError, "Unable to save Daily Sales.");
       setFormError(message);
       return { errors: { form: message } };
     } finally {
@@ -206,9 +279,18 @@ export default function useDailySales() {
     sales,
     tableRows: summarizeSales(sales),
     flowers,
+    availableStockByFlowerId,
+    stockLoading,
+    stockLoaded,
+    stockError,
     loading,
     error,
     refresh,
+    page,
+    setPage,
+    sort,
+    setSort: updateSort,
+    pagination,
     form,
     setForm,
     openCreate,

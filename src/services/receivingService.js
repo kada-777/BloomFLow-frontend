@@ -4,9 +4,24 @@ function unwrap(response) {
   return response.data?.data ?? response.data;
 }
 
+function unwrapPaginated(response) {
+  return {
+    data: Array.isArray(response.data?.data) ? response.data.data : [],
+    pagination: response.data?.pagination || null,
+  };
+}
+
 export const receivingService = {
-  async list() {
-    return unwrap(await api.get("/receivings", { params: { limit: "100" } }));
+  async list({ page = 1, limit = 10, receivedDate = "", farmId = "", search = "" } = {}) {
+    return unwrapPaginated(await api.get("/receivings", {
+      params: {
+        page,
+        limit,
+        ...(receivedDate ? { receivedDate } : {}),
+        ...(farmId ? { farmId } : {}),
+        ...(search ? { search } : {}),
+      },
+    }));
   },
 
   async getById(id) {

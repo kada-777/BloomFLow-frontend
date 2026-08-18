@@ -6,8 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Inventory from "./pages/Inventory";
 import BatchDetail from "./pages/Inventory/BatchDetail";
 import Distribution from "./pages/Distribution";
-import Forecasting from "./pages/Forecasting";
-import Analytics from "./pages/Analytics";
+import DistributionPlanning from "./pages/DistributionPlanning";
 import QualityControl from "./pages/QualityControl";
 import Branches from "./pages/Branches";
 import Farms from "./pages/Farms";
@@ -16,6 +15,7 @@ import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import Receiving from "./pages/Receiving";
 import DailySales from "./pages/DailySales";
+import DashboardReport from "./components/dashboard/DashboardReport";
 function Protected() {
   const { user, isRestoring } = useAuth();
 
@@ -27,13 +27,15 @@ export default function App() {
   return (
     <Routes>
       <Route path="/auth" element={<Auth />} />
+      <Route path="/dashboard/report" element={<DashboardReport />} />
       <Route element={<Protected />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/inventory/:flowerId" element={<BatchDetail />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/distribution" element={<Distribution />} />
-        <Route path="/forecasting" element={<Forecasting />} />
-        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/distribution-planning" element={<DistributionPlanning />} />
+        <Route path="/forecasting" element={<Navigate to="/distribution-planning" replace />} />
+        <Route path="/analytics" element={<Navigate to="/" replace />} />
         <Route path="/quality-control" element={<QualityControl />} />
         <Route path="/branches" element={<Branches />} />
         <Route path="/farms" element={<Farms />} />

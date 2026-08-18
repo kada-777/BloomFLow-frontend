@@ -1,0 +1,77 @@
+.dashboard-report {
+  display: grid;
+  gap: 22px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.dashboard-report-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.dashboard-report-header {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 22px 24px;
+}
+
+.dashboard-report-header h1 {
+  font: 800 26px "Plus Jakarta Sans";
+  letter-spacing: -0.04em;
+  margin: 0 0 6px;
+}
+
+.dashboard-report-subtitle {
+  color: var(--muted);
+  display: block;
+  font-size: 13px;
+  margin: 0;
+}
+
+.dashboard-chart-grid > * .dashboard-chart {
+  height: 280px;
+}
+
+@media (max-width: 760px) {
+  .dashboard-report {
+    padding: 20px 14px;
+  }
+
+  .dashboard-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-report-header h1 {
+    font-size: 22px;
+  }
+}
+
+@media print {
+  .dashboard-report-controls,
+  .pagination {
+    display: none;
+  }
+
+  .dashboard-report {
+    padding: 0;
+    max-width: none;
+  }
+
+  .dashboard-report-header,
+  .dashboard-summary-grid > *,
+  .dashboard-chart-grid > *,
+  .dashboard-activity-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+}

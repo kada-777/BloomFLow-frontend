@@ -23,39 +23,39 @@ function normalizeList(value) {
   return [];
 }
 
-function decimal(value) {
-  return /^\d+(\.\d{1,2})?$/.test(String(value).trim()) ? Number(value) : null;
+function integer(value) {
+  return /^\d+$/.test(String(value).trim()) ? Number(value) : null;
 }
 
 export function validateReceivingForm(payload) {
   const errors = {};
   const items = payload.items || [];
 
-  if (!payload.farmId) errors.farmId = "Farm wajib dipilih.";
-  if (!payload.receivedDate) errors.receivedDate = "Tanggal diterima wajib diisi.";
-  if (!items.length) errors.items = "Minimal satu jenis bunga harus ditambahkan.";
+  if (!payload.farmId) errors.farmId = "A farm must be selected.";
+  if (!payload.receivedDate) errors.receivedDate = "The received date is required.";
+  if (!items.length) errors.items = "Add at least one flower type.";
 
   const flowerIds = new Set();
   items.forEach((item, index) => {
     const prefix = `items.${index}`;
-    if (!item.flowerId) errors[`${prefix}.flowerId`] = "Flower wajib dipilih.";
-    if (item.flowerId && flowerIds.has(String(item.flowerId))) errors[`${prefix}.flowerId`] = "Flower tidak boleh sama.";
+    if (!item.flowerId) errors[`${prefix}.flowerId`] = "A flower must be selected.";
+    if (item.flowerId && flowerIds.has(String(item.flowerId))) errors[`${prefix}.flowerId`] = "Flowers cannot be duplicated.";
     flowerIds.add(String(item.flowerId));
 
     ["shippedQuantity", "actualReceivedQuantity", "acceptedQuantity", "unusableQuantity"].forEach((field) => {
-      if (decimal(item[field]) === null) errors[`${prefix}.${field}`] = "Masukkan angka desimal yang valid.";
+       if (integer(item[field]) === null) errors[`${prefix}.${field}`] = "Enter a whole number.";
     });
 
-    const shipped = decimal(item.shippedQuantity);
-    const actual = decimal(item.actualReceivedQuantity);
-    const accepted = decimal(item.acceptedQuantity);
-    const unusable = decimal(item.unusableQuantity);
+     const shipped = integer(item.shippedQuantity);
+     const actual = integer(item.actualReceivedQuantity);
+     const accepted = integer(item.acceptedQuantity);
+     const unusable = integer(item.unusableQuantity);
 
     if (shipped !== null && actual !== null && actual > shipped) {
-      errors[`${prefix}.actualReceivedQuantity`] = "Actual received tidak boleh melebihi shipped quantity.";
+      errors[`${prefix}.actualReceivedQuantity`] = "Actual received quantity cannot exceed shipped quantity.";
     }
     if (accepted !== null && unusable !== null && actual !== null && accepted + unusable !== actual) {
-      errors[`${prefix}.acceptedQuantity`] = "Accepted + unusable harus sama dengan actual received.";
+      errors[`${prefix}.acceptedQuantity`] = "Accepted plus unusable quantity must equal actual received quantity.";
     }
   });
 
@@ -82,8 +82,11 @@ export default function useReceiving() {
   const [farms, setFarms] = useState([]);
   const [flowers, setFlowers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedFarm, setSelectedFarm] = useState("all");
   const [selectedDate, setSelectedDate] = useState("");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [detail, setDetail] = useState(null);
@@ -99,34 +102,57 @@ export default function useReceiving() {
     setLoading(true);
     setError("");
     const results = await Promise.allSettled([
-      receivingService.list(),
+      receivingService.list({
+        page,
+        limit: 10,
+        receivedDate: selectedDate,
+        farmId: selectedFarm === "all" ? "" : selectedFarm,
+        search: debouncedSearch,
+      }),
       receivingService.listFarms(),
       receivingService.listFlowers(),
     ]);
 
     const [receivingResult, farmResult, flowerResult] = results;
-    if (receivingResult.status === "fulfilled") setReceivings(normalizeList(receivingResult.value));
-    else setError(getApiError(receivingResult.reason, "Data receiving gagal dimuat."));
+    if (receivingResult.status === "fulfilled") {
+      setReceivings(normalizeList(receivingResult.value.data));
+      setPagination(receivingResult.value.pagination);
+    }
+    else setError(getApiError(receivingResult.reason, "Unable to load receiving data."));
     if (farmResult.status === "fulfilled") setFarms(normalizeList(farmResult.value));
-    else setError((current) => current || getApiError(farmResult.reason, "Data farm gagal dimuat."));
+    else setError((current) => current || getApiError(farmResult.reason, "Unable to load farms."));
     if (flowerResult.status === "fulfilled") setFlowers(normalizeList(flowerResult.value));
-    else setError((current) => current || getApiError(flowerResult.reason, "Data flower gagal dimuat."));
+    else setError((current) => current || getApiError(flowerResult.reason, "Unable to load flowers."));
     setLoading(false);
-  }, []);
+  }, [debouncedSearch, page, selectedDate, selectedFarm]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  const filteredReceivings = receivings.filter((receiving) => {
-    const farmName = receiving.farm?.name || "";
-    const id = String(receiving.id || "");
-    const query = searchTerm.trim().toLowerCase();
-    const matchesSearch = !query || id.includes(query) || farmName.toLowerCase().includes(query) || String(receiving.farmId || "").includes(query);
-    const matchesFarm = selectedFarm === "all" || String(receiving.farmId) === String(selectedFarm);
-    const matchesDate = !selectedDate || String(receiving.receivedDate).slice(0, 10) === selectedDate;
-    return matchesSearch && matchesFarm && matchesDate;
-  });
+  useEffect(() => {
+    if (pagination?.totalPages && page > pagination.totalPages) setPage(pagination.totalPages);
+  }, [page, pagination]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, 300);
+    return () => window.clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const updateSearchTerm = (value) => {
+    setSearchTerm(value);
+    setPage(1);
+  };
+  const updateSelectedFarm = (value) => {
+    setSelectedFarm(value);
+    setPage(1);
+  };
+  const updateSelectedDate = (value) => {
+    setSelectedDate(value);
+    setPage(1);
+  };
 
   const openCreate = () => {
     setDetail(null);
@@ -145,7 +171,7 @@ export default function useReceiving() {
     try {
       setDetail(await receivingService.getById(id));
     } catch (requestError) {
-      setDetailError(getApiError(requestError, "Detail receiving gagal dimuat."));
+      setDetailError(getApiError(requestError, "Unable to load receiving details."));
     } finally {
       setDetailLoading(false);
     }
@@ -161,7 +187,7 @@ export default function useReceiving() {
   const submitCreate = async (payload) => {
     const validationErrors = validateReceivingForm(payload);
     if (Object.keys(validationErrors).length) {
-      setFormError("Periksa kembali field Receiving yang belum valid.");
+      setFormError("Review the invalid Receiving fields.");
       return { errors: validationErrors };
     }
 
@@ -170,11 +196,11 @@ export default function useReceiving() {
     try {
       await receivingService.create(normalizePayload(payload));
       setFormOpen(false);
-      setSuccessMessage("Receiving berhasil disimpan.");
+      setSuccessMessage("Receiving saved successfully.");
       await refresh();
       return { errors: {} };
     } catch (requestError) {
-      const message = getApiError(requestError, "Receiving gagal disimpan.");
+      const message = getApiError(requestError, "Unable to save Receiving.");
       setFormError(message);
       return { errors: { form: message } };
     } finally {
@@ -184,15 +210,17 @@ export default function useReceiving() {
 
   return {
     receivings,
-    filteredReceivings,
     farms,
     flowers,
     searchTerm,
-    setSearchTerm,
+    setSearchTerm: updateSearchTerm,
     selectedFarm,
-    setSelectedFarm,
+    setSelectedFarm: updateSelectedFarm,
     selectedDate,
-    setSelectedDate,
+    setSelectedDate: updateSelectedDate,
+    page,
+    setPage,
+    pagination,
     loading,
     error,
     refresh,

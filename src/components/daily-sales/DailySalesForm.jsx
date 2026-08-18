@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Plus, Save, Trash2, X } from "lucide-react";
+import { normalizeIntegerQuantity } from "../../utils/quantity";
 
 function fieldError(errors, index, field) {
   return errors[`items.${index}.${field}`];
@@ -9,6 +10,10 @@ export default function DailySalesForm({
   open,
   form,
   flowers,
+  availableStockByFlowerId,
+  stockLoading,
+  stockLoaded,
+  stockError,
   onChange,
   onAddItem,
   onRemoveItem,
@@ -36,6 +41,17 @@ export default function DailySalesForm({
     setFieldErrors((current) => ({ ...current, [`items.${index}.${field}`]: "" }));
   };
 
+  const normalizeQuantityField = (index, field, value) => {
+    updateItem(index, field, normalizeIntegerQuantity(value));
+  };
+
+  const availableStockLabel = (flowerId) => {
+    if (!flowerId) return "-";
+    if (stockLoading) return "Loading...";
+    if (!stockLoaded) return "Unavailable";
+    return Number(availableStockByFlowerId[String(flowerId)] ?? 0).toLocaleString("id-ID");
+  };
+
   return (
     <div className="modal-backdrop" role="presentation">
       <section className="daily-sales-modal" role="dialog" aria-modal="true" aria-labelledby="daily-sales-form-title">
@@ -44,17 +60,18 @@ export default function DailySalesForm({
             <div>
               <span className="daily-sales-eyebrow">BRANCH OPERATIONS</span>
               <h2 id="daily-sales-form-title">Add Sales</h2>
-              <p>Catat penjualan bunga harian cabang.</p>
+              <p>Record daily flower sales for your branch.</p>
             </div>
-            <button className="daily-sales-close" type="button" onClick={onClose} disabled={submitting} aria-label="Tutup Add Sales">
+            <button className="daily-sales-close" type="button" onClick={onClose} disabled={submitting} aria-label="Close Add Sales">
               <X size={20} />
             </button>
           </header>
 
           <div className="daily-sales-modal-body">
             {error && <div className="daily-sales-error" role="alert">{error}</div>}
+            {stockError && <div className="daily-sales-stock-notice" role="status">{stockError}</div>}
             <label className="daily-sales-field daily-sales-date-field">
-              <span>Tanggal Sales</span>
+              <span>Sales Date</span>
               <input
                 type="date"
                 value={form.salesDate}
@@ -68,8 +85,8 @@ export default function DailySalesForm({
             </label>
 
             <div className="daily-sales-items-heading">
-              <div><span>SALES ITEMS</span><h3>Detail penjualan bunga</h3></div>
-              <button className="daily-sales-secondary-button" type="button" onClick={onAddItem} disabled={submitting} aria-label="Tambah flower item">
+              <div><span>SALES ITEMS</span><h3>Flower sales details</h3></div>
+              <button className="daily-sales-secondary-button" type="button" onClick={onAddItem} disabled={submitting} aria-label="Add flower item">
                 <Plus size={16} /> Add Flower
               </button>
             </div>
@@ -80,7 +97,7 @@ export default function DailySalesForm({
                 <header className="daily-sales-item-header">
                   <strong>FLOWER ITEM {index + 1}</strong>
                   {form.items.length > 1 && (
-                    <button className="daily-sales-remove" type="button" onClick={() => onRemoveItem(index)} disabled={submitting} aria-label={`Hapus flower item ${index + 1}`}>
+                    <button className="daily-sales-remove" type="button" onClick={() => onRemoveItem(index)} disabled={submitting} aria-label={`Delete flower item ${index + 1}`}>
                       <Trash2 size={16} />
                     </button>
                   )}
@@ -89,30 +106,36 @@ export default function DailySalesForm({
                   <label className="daily-sales-field">
                     <span>Flower</span>
                     <select value={item.flowerId} onChange={(event) => updateItem(index, "flowerId", event.target.value)} disabled={submitting}>
-                      <option value="">Pilih flower</option>
+                      <option value="">Select a flower</option>
                       {flowers.map((flower) => <option key={flower.id} value={flower.id}>{flower.name}{flower.variety ? ` · ${flower.variety}` : ""}</option>)}
                     </select>
                     {fieldError(fieldErrors, index, "flowerId") && <em>{fieldError(fieldErrors, index, "flowerId")}</em>}
                   </label>
                   <label className="daily-sales-field">
                     <span>Sold Qty</span>
-                    <input type="number" min="0" step="0.01" value={item.soldQuantity} onChange={(event) => updateItem(index, "soldQuantity", event.target.value)} disabled={submitting} />
+                    <input type="number" min="0" step="1" value={item.soldQuantity} onChange={(event) => updateItem(index, "soldQuantity", event.target.value)} onBlur={(event) => normalizeQuantityField(index, "soldQuantity", event.target.value)} disabled={submitting} />
                     {fieldError(fieldErrors, index, "soldQuantity") && <em>{fieldError(fieldErrors, index, "soldQuantity")}</em>}
                   </label>
                   <label className="daily-sales-field">
                     <span>Damaged Qty</span>
-                    <input type="number" min="0" step="0.01" value={item.damagedQuantity} onChange={(event) => updateItem(index, "damagedQuantity", event.target.value)} disabled={submitting} />
+                    <input type="number" min="0" step="1" value={item.damagedQuantity} onChange={(event) => updateItem(index, "damagedQuantity", event.target.value)} onBlur={(event) => normalizeQuantityField(index, "damagedQuantity", event.target.value)} disabled={submitting} />
                     {fieldError(fieldErrors, index, "damagedQuantity") && <em>{fieldError(fieldErrors, index, "damagedQuantity")}</em>}
                   </label>
+                  <div className="daily-sales-field">
+                    <span>Current Available Stock</span>
+                    <div className="daily-sales-stock-value" aria-live="polite">
+                      {availableStockLabel(item.flowerId)}
+                    </div>
+                  </div>
                 </div>
               </section>
             ))}
           </div>
 
           <footer className="daily-sales-modal-footer">
-            <button className="daily-sales-secondary-button" type="button" onClick={onClose} disabled={submitting}>Tutup</button>
+            <button className="daily-sales-secondary-button" type="button" onClick={onClose} disabled={submitting}>Close</button>
             <button className="daily-sales-primary-button" type="submit" disabled={submitting}>
-              <Save size={17} /> {submitting ? "Menyimpan..." : "Simpan Sales"}
+              <Save size={17} /> {submitting ? "Saving..." : "Save Sales"}
             </button>
           </footer>
         </form>
